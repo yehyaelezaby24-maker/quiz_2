@@ -1,0 +1,3743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mini Quiz — Test</title>
+<style>
+.ico{display:inline-block;width:1em;height:1em;vertical-align:-.125em;fill:currentColor;flex-shrink:0;}
+</style>
+<style>
+/* ═══════════════════════════════════════════
+TOKENS
+═══════════════════════════════════════════ */
+:root {
+--primary:#4f46e5; --primary-light:#e0e7ff; --primary-dark:#3730a3;
+--secondary:#10b981; --secondary-light:#d1fae5;
+--danger:#ef4444; --danger-light:#fee2e2;
+--warning:#f59e0b; --warning-light:#fef3c7;
+--exam:#8b5cf6; --exam-light:#ede9fe;
+--written:#06b6d4; --written-light:#cffafe;
+--gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+--gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
+--gray-600:#4b5563; --gray-700:#374151; --gray-800:#1f2937;
+--radius:0.75rem;
+--shadow:0 2px 8px rgba(0,0,0,.09);
+--shadow-lg:0 8px 24px rgba(0,0,0,.13);
+--sidebar-w:280px;
+--header-h:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+body{background:var(--gray-50);color:var(--gray-800);height:100dvh;overflow:hidden;display:flex;flex-direction:column;}
+/* ═══════════════════════════════════════════
+APP SHELL
+═══════════════════════════════════════════ */
+.app{display:flex;flex:1;overflow:hidden;position:relative;}
+/* ═══════════════════════════════════════════
+HEADER
+═══════════════════════════════════════════ */
+.topbar{
+height:var(--header-h);background:var(--card-bg,white);border-bottom:1px solid var(--gray-200);
+display:flex;align-items:center;padding:0 1rem;gap:.75rem;flex-shrink:0;
+position:relative;z-index:200;
+}
+.topbar-menu{
+width:36px;height:36px;border-radius:8px;border:none;background:none;
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;color:var(--gray-600);font-size:1rem;flex-shrink:0;
+transition:background .15s;
+}
+.topbar-menu:hover{background:var(--gray-100);}
+.topbar-title{font-size:1.05rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
+/* ═══════════════════════════════════════════
+SIDEBAR
+═══════════════════════════════════════════ */
+.sidebar{
+width:var(--sidebar-w);flex-shrink:0;
+background:var(--card-bg,white);border-right:1px solid var(--gray-200);
+display:flex;flex-direction:column;
+overflow:hidden;
+transition:transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s;
+z-index:150;
+}
+/* Mobile: offcanvas */
+@media(max-width:768px){
+.sidebar{
+position:fixed;top:0;left:0;height:100%;
+transform:translateX(-100%);
+box-shadow:none;
+}
+.sidebar.open{
+transform:translateX(0);
+box-shadow:4px 0 24px rgba(0,0,0,.18);
+}
+}
+/* Desktop: always visible */
+@media(min-width:769px){
+.sidebar{transform:none !important;}
+.sidebar-overlay{display:none !important;}
+}
+.sidebar-overlay{
+display:none;position:fixed;inset:0;
+background:rgba(0,0,0,.3);z-index:140;
+}
+.sidebar-overlay.show{display:block;}
+/* Sidebar header */
+.sidebar-header{
+height:var(--header-h);display:flex;align-items:center;
+padding:0 1rem;gap:.6rem;flex-shrink:0;
+border-bottom:1px solid var(--gray-100);
+}
+.sidebar-logo{
+width:32px;height:32px;border-radius:8px;background:var(--primary-light);
+display:flex;align-items:center;justify-content:center;
+color:var(--primary);font-size:.85rem;flex-shrink:0;
+}
+.sidebar-quiz-title{
+font-weight:700;font-size:.95rem;flex:1;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sidebar-close{
+width:28px;height:28px;border-radius:6px;border:none;background:none;
+cursor:pointer;color:var(--gray-400);font-size:.85rem;
+display:none;align-items:center;justify-content:center;
+transition:background .15s;
+}
+@media(max-width:768px){.sidebar-close{display:flex;}}
+.sidebar-close:hover{background:var(--gray-100);color:var(--gray-700);}
+/* Sidebar nav sections */
+.sidebar-nav{flex-shrink:0;padding:.5rem 0;}
+.snav-item{
+display:flex;align-items:center;gap:.65rem;
+padding:.65rem 1.1rem;cursor:pointer;
+font-size:.88rem;font-weight:600;color:var(--gray-600);
+border-left:3px solid transparent;
+transition:all .15s;
+}
+.snav-item:hover{background:var(--gray-50);color:var(--gray-800);}
+.snav-item.active{background:var(--primary-light);color:var(--primary-dark);border-left-color:var(--primary);}
+.snav-item i{width:18px;text-align:center;font-size:.9rem;flex-shrink:0;}
+.snav-badge{
+margin-left:auto;background:var(--primary);color:white;
+font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:999px;
+}
+.snav-divider{height:1px;background:var(--gray-100);margin:.35rem .75rem;}
+/* Sidebar sections list */
+.sidebar-sections{flex:1;overflow-y:auto;padding:.25rem 0 .5rem;}
+.sidebar-sections::-webkit-scrollbar{width:4px;}
+.sidebar-sections::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:2px;}
+/* Folder in sidebar */
+.sf-folder{margin-bottom:2px;}
+.sf-folder-hd{
+display:flex;align-items:center;gap:.5rem;
+padding:.55rem .9rem .55rem 1rem;cursor:pointer;
+font-size:.82rem;font-weight:700;color:var(--gray-600);
+transition:background .1s;user-select:none;
+}
+.sf-folder-hd:hover{background:var(--gray-50);}
+.sf-folder-hd .fi{font-size:.88rem;flex-shrink:0;}
+.sf-folder-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sf-folder-stat{font-size:.68rem;color:var(--gray-400);white-space:nowrap;}
+.sf-folder-chev{font-size:.65rem;color:var(--gray-400);flex-shrink:0;transition:transform .2s;}
+.sf-folder-hd.collapsed .sf-folder-chev{transform:rotate(-90deg);}
+.sf-children{padding:0;}
+.sf-children.hidden{display:none;}
+/* Subfolder */
+.sf-subfolder-hd{
+display:flex;align-items:center;gap:.5rem;
+padding:.45rem .9rem .45rem 2rem;cursor:pointer;
+font-size:.78rem;font-weight:600;color:var(--gray-500);
+background:var(--gray-50);
+transition:background .1s;
+}
+.sf-subfolder-hd:hover{background:var(--gray-100);}
+/* Section row in sidebar */
+.sf-sec{
+display:flex;align-items:center;gap:.5rem;
+padding:.5rem .9rem .5rem 1.1rem;cursor:pointer;
+font-size:.82rem;color:var(--gray-700);
+border-left:2px solid transparent;
+transition:all .12s;position:relative;
+}
+.sf-sec.ind1{padding-left:1.75rem;}
+.sf-sec.ind2{padding-left:2.4rem;}
+.sf-sec:hover{background:var(--primary-light);color:var(--primary-dark);}
+.sf-sec.active-sec{background:var(--primary-light);color:var(--primary-dark);border-left-color:var(--primary);font-weight:600;}
+.sf-sec-icon{
+width:24px;height:24px;border-radius:6px;
+background:var(--gray-100);color:var(--gray-500);
+display:flex;align-items:center;justify-content:center;
+font-size:.7rem;flex-shrink:0;
+}
+.sf-sec.active-sec .sf-sec-icon{background:var(--primary);color:white;}
+.sf-sec-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sf-sec-pct{font-size:.65rem;color:var(--gray-400);white-space:nowrap;flex-shrink:0;}
+.sf-sec.active-sec .sf-sec-pct{color:var(--primary);}
+.sf-sec-done{
+width:16px;height:16px;border-radius:50%;
+background:var(--secondary);color:white;
+display:flex;align-items:center;justify-content:center;
+font-size:.55rem;flex-shrink:0;
+}
+.ungrouped-lbl{
+font-size:.65rem;font-weight:700;color:var(--gray-400);
+text-transform:uppercase;letter-spacing:.07em;
+padding:.6rem 1.1rem .25rem;
+}
+/* Sidebar bottom */
+.sidebar-bottom{
+flex-shrink:0;border-top:1px solid var(--gray-100);
+padding:.5rem .75rem;display:flex;gap:.4rem;
+}
+.sbot-btn{
+flex:1;padding:.45rem;border-radius:var(--radius);border:1px solid var(--gray-200);
+background:none;cursor:pointer;font-size:.72rem;font-weight:600;color:var(--gray-500);
+display:flex;flex-direction:column;align-items:center;gap:.2rem;
+transition:all .15s;
+}
+.sbot-btn:hover{background:var(--gray-50);border-color:var(--gray-300);color:var(--gray-700);}
+.sbot-btn i{font-size:.85rem;}
+.sbot-btn.exam-btn:hover{background:var(--exam-light);border-color:var(--exam);color:var(--exam);}
+.sbot-btn.review-btn:hover{background:#ede9fe;border-color:#7c3aed;color:#7c3aed;}
+/* ═══════════════════════════════════════════
+MAIN CONTENT
+═══════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.content-area{flex:1;overflow-y:auto;padding:1.25rem;padding-bottom:max(4rem,calc(1.25rem + env(safe-area-inset-bottom)));}
+@media(max-width:600px){.content-area{padding:1rem;padding-bottom:max(4rem,calc(1rem + env(safe-area-inset-bottom)));}}
+.container{max-width:760px;margin:0 auto;}
+.screen{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.screen.active{display:flex;}
+/* ═══════════════════════════════════════════
+SECTION SUBHEADER (in normal mode)
+═══════════════════════════════════════════ */
+.sec-subheader{
+background:var(--card-bg,white);border-bottom:1px solid var(--gray-200);
+padding:.5rem 1.25rem .4rem;flex-shrink:0;
+}
+.sec-prog-row{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--gray-500);margin-bottom:.3rem;}
+.sec-prog-bar-wrap{height:6px;background:var(--gray-100);border-radius:999px;overflow:hidden;}
+.sec-prog-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--secondary),var(--primary));transition:width .4s;}
+/* ═══════════════════════════════════════════
+LIBRARY (home screen)
+═══════════════════════════════════════════ */
+.lib-hero{
+background:var(--card-bg,white);border-radius:var(--radius);padding:1.25rem 1.5rem;
+box-shadow:var(--shadow);border:1px solid var(--gray-200);margin-bottom:1rem;
+}
+.lib-hero h2{font-size:1.25rem;font-weight:800;margin-bottom:.2rem;}
+.lib-hero p{font-size:.82rem;color:var(--gray-500);}
+.lib-desc{
+background:var(--primary-light);border-left:3px solid var(--primary);
+border-radius:var(--radius);padding:.75rem 1rem;margin-bottom:.75rem;
+font-size:.88rem;color:var(--primary-dark);line-height:1.55;
+}
+.lib-start-btn{
+display:flex;align-items:center;gap:.6rem;justify-content:center;
+margin-top:.85rem;padding:.65rem;border-radius:var(--radius);
+background:var(--primary);color:white;border:none;cursor:pointer;
+font-size:.9rem;font-weight:700;width:100%;transition:background .15s;
+}
+.lib-start-btn:hover{background:var(--primary-dark);}
+/* Folder group in library (main content) */
+.folder-group{background:var(--card-bg,white);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--gray-200);margin-bottom:.75rem;overflow:hidden;}
+.folder-hd{
+display:flex;align-items:center;gap:.6rem;padding:.9rem 1.25rem;cursor:pointer;
+border-bottom:1px solid var(--gray-100);user-select:none;transition:background .1s;
+}
+.folder-hd:active{background:var(--gray-50);}
+.folder-hd-name{flex:1;font-weight:700;font-size:.95rem;color:var(--gray-700);}
+.folder-hd-stat{font-size:.72rem;color:var(--gray-400);white-space:nowrap;}
+.folder-hd-chev{color:var(--gray-400);font-size:.72rem;transition:transform .2s;flex-shrink:0;}
+.folder-hd.collapsed .folder-hd-chev{transform:rotate(-90deg);}
+.folder-children.collapsed{display:none;}
+.subfolder-hd{
+display:flex;align-items:center;gap:.5rem;
+padding:.6rem 1.25rem .6rem 2rem;cursor:pointer;
+background:var(--gray-50);border-bottom:1px solid var(--gray-100);
+user-select:none;
+}
+.subfolder-name{flex:1;font-weight:600;font-size:.88rem;color:var(--gray-600);}
+.subfolder-chev{color:var(--gray-400);font-size:.65rem;transition:transform .2s;}
+.subfolder-hd.collapsed .subfolder-chev{transform:rotate(-90deg);}
+/* Section row inside library cards */
+.sec-row{
+display:flex;align-items:center;gap:.75rem;padding:.85rem 1.25rem;
+border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s;
+}
+.sec-row:last-child{border-bottom:none;}
+.sec-row:active{background:var(--primary-light);}
+.sec-row.ind1{padding-left:1.75rem;}
+.sec-row.ind2{padding-left:2.5rem;}
+.sec-row-icon{
+width:36px;height:36px;border-radius:10px;
+background:var(--primary-light);color:var(--primary);
+display:flex;align-items:center;justify-content:center;
+font-size:.85rem;flex-shrink:0;
+}
+.sec-row-body{flex:1;min-width:0;}
+.sec-row-name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sec-row-desc{font-size:.74rem;color:var(--gray-500);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sec-row-prog{display:flex;align-items:center;gap:.4rem;margin-top:.3rem;}
+.sec-row-prog-bar{flex:1;height:5px;background:var(--gray-200);border-radius:3px;overflow:hidden;}
+.sec-row-prog-fill{height:100%;background:linear-gradient(90deg,var(--secondary),var(--primary));border-radius:3px;transition:width .3s;}
+.sec-row-prog-txt{font-size:.68rem;color:var(--gray-400);white-space:nowrap;}
+.sec-row-arrow{color:var(--gray-300);font-size:.75rem;flex-shrink:0;}
+.ungrouped-label{font-size:.72rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;padding:.75rem 0 .25rem;}
+.folder-reset-btn{
+padding:.2rem .55rem;border-radius:6px;border:1px solid var(--danger);
+color:var(--danger);background:var(--card-bg,white);font-size:.68rem;font-weight:600;
+cursor:pointer;flex-shrink:0;transition:all .15s;
+}
+.folder-reset-btn:hover{background:var(--danger-light);}
+/* ═══════════════════════════════════════════
+CARDS
+═══════════════════════════════════════════ */
+.card{
+background:var(--card-bg,white);border-radius:var(--radius);padding:1.35rem;
+margin-bottom:1.1rem;box-shadow:var(--shadow);
+border:1px solid var(--gray-200);border-left-width:4px;
+border-left-color:var(--gray-200);
+}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;border-bottom:1px solid var(--gray-100);padding-bottom:.85rem;}
+.badge{display:inline-block;padding:.22rem .5rem;border-radius:999px;font-size:.72rem;font-weight:700;background:var(--gray-200);color:var(--gray-700);}
+.badge-mcq{background:var(--primary-light);color:var(--primary-dark);}
+.badge-tf{background:var(--warning-light);color:#b45309;}
+.badge-written{background:var(--written-light);color:#0e7490;}
+.badge-mcq-multi{background:#f0fdf4;color:#166534;border:1.5px solid #86efac;}
+.badge-ordering{background:#fff7ed;color:#c2410c;border:1.5px solid #fdba74;}
+.badge-matching{background:#f3e8ff;color:#6d28d9;}
+.q-num{font-size:.75rem;font-weight:600;color:var(--gray-400);margin-left:.25rem;}
+.q-text{font-size:.97rem;line-height:1.58;margin-bottom:.85rem;white-space:pre-wrap;}
+/* ═══════════════════════════════════════════
+OPTIONS
+═══════════════════════════════════════════ */
+.options-grid{display:flex;flex-direction:column;gap:.55rem;}
+.option-item{display:flex;align-items:center;padding:.85rem 1rem;border:1px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;transition:.18s;background:var(--card-bg,white);gap:.7rem;}
+.option-item:hover{background:var(--gray-50);border-color:var(--gray-300);}
+.option-item.selected{background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark);font-weight:500;}
+.option-item.correct{background:var(--secondary-light);border-color:var(--secondary);color:#047857;}
+.option-item.incorrect{background:var(--danger-light);border-color:var(--danger);color:#b91c1c;}
+.option-item-missed{background:#fffbeb;border-color:#f59e0b;color:#92400e;}
+[data-theme="dark"] .option-item.selected{background:#312e81 !important;border-color:#818cf8 !important;color:#e0e7ff !important;font-weight:600;}
+[data-theme="dark"] .option-item-missed{background:#451a03 !important;border-color:#c2410c !important;color:#fcd34d !important;}
+[data-theme="dark"] .option-item-missed *{color:#fcd34d !important;}
+.option-item.disabled{opacity:.65;cursor:not-allowed;pointer-events:none;}
+.option-letter{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:700;flex-shrink:0;background:var(--gray-100);color:var(--gray-600);transition:all .18s;}
+.option-item.selected .option-letter{background:var(--primary);color:white;}
+.option-item.correct .option-letter{background:var(--secondary);color:white;}
+.option-item.incorrect .option-letter{background:var(--danger);color:white;}
+.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;}
+/* ═══════════════════════════════════════════
+FEEDBACK
+═══════════════════════════════════════════ */
+.feedback{margin-top:1.1rem;padding:.9rem 1rem;border-radius:var(--radius);display:none;}
+.feedback.show{display:block;}
+.feedback-correct{background:var(--secondary-light);border-left:4px solid var(--secondary);}
+.feedback-incorrect{background:var(--danger-light);border-left:4px solid var(--danger);}
+.feedback strong{display:block;margin-bottom:.15rem;}
+.feedback .explanation{font-size:.88rem;color:var(--gray-600);margin-top:.3rem;line-height:1.5;white-space:pre-wrap;}
+/* ═══════════════════════════════════════════
+WRITTEN
+═══════════════════════════════════════════ */
+.written-answer-box{margin-top:.9rem;padding:.9rem;background:var(--gray-50);border-radius:var(--radius);}
+.written-answer-box textarea{width:100%;padding:.7rem;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:.95rem;resize:vertical;min-height:90px;font-family:inherit;}
+.written-answer-box textarea:focus{outline:none;border-color:var(--primary);}
+.written-answer-box textarea:disabled{background:var(--gray-100);cursor:not-allowed;}
+.written-saved{background:var(--card-bg,white);padding:.7rem;border:1px solid var(--gray-200);border-radius:var(--radius);white-space:pre-wrap;line-height:1.6;font-size:.92rem;}
+/* ═══════════════════════════════════════════
+MATCHING
+═══════════════════════════════════════════ */
+.matching-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem;}
+.match-item{padding:.55rem .65rem;border-radius:var(--radius);border:1.5px solid var(--gray-200);cursor:pointer;font-size:.85rem;transition:all .15s;background:var(--card-bg,white);min-height:42px;display:flex;align-items:center;line-height:1.3;}
+.match-item:hover{border-color:var(--gray-300);background:var(--gray-50);}
+.match-item.selected{border-color:var(--primary);background:var(--primary-light);color:var(--primary-dark);}
+.match-item.matched{border-color:var(--secondary);background:var(--secondary-light);}
+.match-item.match-correct{border-color:var(--secondary);background:var(--secondary-light);color:#047857;}
+.match-item.match-wrong{border-color:var(--danger);background:var(--danger-light);color:#b91c1c;}
+.match-item.disabled{pointer-events:none;}
+/* ═══════════════════════════════════════════
+ORDERING
+═══════════════════════════════════════════ */
+.ordering-list{display:flex;flex-direction:column;gap:.4rem;}
+.ordering-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;background:var(--card-bg,white);border:1.5px solid var(--gray-200);border-radius:var(--radius);user-select:none;-webkit-user-select:none;touch-action:none;transition:background .15s,border-color .15s;}
+.ordering-item.ordering-correct{border-color:var(--secondary);background:var(--secondary-light);}
+.ordering-item.ordering-wrong{border-color:var(--danger);background:var(--danger-light);}
+.ordering-item.dm-dragging{opacity:.35;}
+.ordering-item.dm-drop-before{box-shadow:0 -3px 0 0 var(--primary) !important;}
+.ordering-item.dm-drop-after{box-shadow:0 3px 0 0 var(--primary) !important;}
+.ordering-handle{color:var(--gray-400);font-size:.85rem;flex-shrink:0;cursor:grab;touch-action:none;}
+.ordering-handle:active{cursor:grabbing;}
+.ordering-pos-badge{font-size:.72rem;font-weight:700;color:var(--gray-500);background:var(--gray-100);border-radius:999px;padding:1px 7px;flex-shrink:0;min-width:24px;text-align:center;}
+.dm-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:.75;border-radius:var(--radius);background:var(--card-bg,white);box-shadow:0 6px 24px rgba(0,0,0,.22);transition:none;}
+/* ═══════════════════════════════════════════
+BUTTONS
+═══════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1rem;border-radius:var(--radius);font-weight:600;cursor:pointer;border:none;transition:.18s;font-size:.88rem;}
+.btn-primary{background:var(--primary);color:white;} .btn-primary:hover{background:var(--primary-dark);}
+.btn-secondary{background:var(--secondary);color:white;}
+.btn-danger{background:var(--danger);color:white;}
+.btn-outline{background:var(--card-bg,white);border:1px solid var(--gray-300);color:var(--gray-700);} .btn-outline:hover{background:var(--gray-50);}
+.btn-exam{background:var(--exam);color:white;} .btn-exam:hover{opacity:.9;}
+.btn-sm{padding:.35rem .75rem;font-size:.82rem;}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--gray-500);padding:.25rem;border-radius:4px;font-size:.95rem;}
+.btn-icon:hover{background:var(--gray-100);color:var(--gray-800);}
+.bookmark-btn{background:none;border:none;color:var(--gray-400);cursor:pointer;padding:.25rem;font-size:1rem;transition:color .15s;}
+.bookmark-btn.active{color:var(--warning);}
+/* ═══════════════════════════════════════════
+EXAM SETUP
+═══════════════════════════════════════════ */
+.modal-section{margin-bottom:1.4rem;}
+.modal-label{display:block;font-weight:700;color:var(--gray-700);margin-bottom:.55rem;font-size:.88rem;}
+.checkbox-group{display:flex;flex-direction:column;gap:.35rem;}
+.checkbox-row{display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;border:1px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;transition:.15s;background:var(--card-bg,white);}
+.checkbox-row:hover{border-color:var(--primary);background:var(--primary-light);}
+.checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;flex-shrink:0;}
+.checkbox-row-label{font-size:.88rem;font-weight:500;flex:1;}
+.checkbox-row-count{font-size:.72rem;color:var(--gray-400);}
+.feedback-toggle{display:flex;gap:.5rem;flex-wrap:wrap;}
+.feedback-toggle label{flex:1;min-width:130px;display:flex;align-items:center;gap:.5rem;padding:.6rem .85rem;border:1px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;transition:.15s;font-size:.85rem;font-weight:500;}
+.feedback-toggle label:hover{border-color:var(--primary);background:var(--primary-light);}
+.feedback-toggle input[type=radio]{accent-color:var(--primary);}
+.shuffle-toggle{display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;border:1px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;background:var(--card-bg,white);}
+.shuffle-toggle input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;}
+.timer-input-row{display:flex;align-items:center;gap:.5rem;}
+.timer-input-row input{width:70px;padding:.4rem .5rem;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:.92rem;text-align:center;font-family:inherit;}
+.timer-input-row input:focus{outline:none;border-color:var(--primary);}
+/* Exam screen sub-header */
+.exam-header-sub{background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:.45rem 1.25rem;display:flex;align-items:center;gap:.75rem;flex-shrink:0;}
+.exam-prog-wrap{flex:1;max-width:320px;}
+.exam-prog-label{font-size:.7rem;color:var(--gray-500);display:flex;justify-content:space-between;margin-bottom:.2rem;}
+.exam-prog-bar{height:5px;background:var(--gray-200);border-radius:3px;overflow:hidden;}
+.exam-prog-fill{height:100%;background:linear-gradient(90deg,var(--secondary),var(--primary));border-radius:3px;transition:width .4s;}
+.timer-badge{background:var(--exam);color:white;padding:.2rem .65rem;border-radius:999px;font-weight:700;font-size:.8rem;display:inline-flex;align-items:center;gap:.3rem;}
+.timer-badge.urgent{background:var(--danger);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.65;}}
+.section-divider-lbl{font-size:.7rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;padding:.35rem 0 .1rem;}
+/* Results */
+.results-hero{text-align:center;padding:2rem 1rem 1.5rem;background:var(--card-bg,white);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--gray-200);margin-bottom:1.5rem;}
+.results-score{font-size:2.8rem;font-weight:900;color:var(--primary);}
+.results-label{font-size:.88rem;color:var(--gray-500);margin-top:.2rem;}
+.results-chips{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;}
+.chip{padding:.3rem .85rem;border-radius:999px;font-size:.78rem;font-weight:700;}
+.chip-correct{background:var(--secondary-light);color:#065f46;}
+.chip-wrong{background:var(--danger-light);color:#7f1d1d;}
+.chip-skip{background:var(--gray-100);color:var(--gray-600);}
+/* Smart Review */
+.review-subnav{display:flex;gap:.4rem;padding:.6rem 1.1rem;border-bottom:1px solid var(--gray-200);background:var(--card-bg,white);position:sticky;top:0;z-index:10;flex-shrink:0;}
+.review-tab{flex:1;padding:.45rem;text-align:center;border-radius:var(--radius);cursor:pointer;font-weight:700;font-size:.82rem;transition:.18s;}
+.review-tab.both-tab{background:var(--gray-100);color:var(--gray-600);}
+.review-tab.both-tab.active{background:var(--primary);color:white;}
+.review-tab.incorrect-tab{background:var(--danger-light);color:var(--danger);}
+.review-tab.incorrect-tab.active{background:var(--danger);color:white;}
+.review-tab.bookmark-tab{background:var(--warning-light);color:#92400e;}
+.review-tab.bookmark-tab.active{background:var(--warning);color:white;}
+/* ═══════════════════════════════════════════
+DIALOG
+═══════════════════════════════════════════ */
+.dlg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:flex-end;justify-content:center;}
+.dlg-overlay.hidden{display:none;}
+.dlg-sheet{background:var(--card-bg,white);border-radius:20px 20px 0 0;padding:1.5rem 1.25rem;width:100%;max-width:520px;padding-bottom:max(1.5rem,env(safe-area-inset-bottom));}
+.dlg-title{font-weight:700;font-size:1rem;margin-bottom:.35rem;}
+.dlg-msg{font-size:.87rem;color:var(--gray-600);margin-bottom:1.2rem;line-height:1.5;}
+.dlg-actions{display:flex;gap:.5rem;}
+.dlg-actions .btn{flex:1;justify-content:center;}
+/* ═══════════════════════════════════════════
+TOAST
+═══════════════════════════════════════════ */
+.mq-toast{
+position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+background:var(--gray-800);color:white;padding:.6rem 1.4rem;
+border-radius:999px;font-size:.85rem;font-weight:600;z-index:9998;
+box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:1;transition:opacity .35s;pointer-events:none;
+}
+/* ═══════════════════════════════════════════
+SCROLL FAB
+═══════════════════════════════════════════ */
+#scrollFab{
+position:fixed;bottom:1.5rem;right:1.25rem;
+width:40px;height:40px;border-radius:50%;
+background:var(--primary);color:white;border:none;cursor:pointer;z-index:300;
+display:flex;align-items:center;justify-content:center;font-size:.9rem;
+box-shadow:0 4px 12px rgba(79,70,229,.4);opacity:.85;
+transition:background .2s,transform .2s,opacity .2s;
+}
+#scrollFab:hover{background:var(--primary-dark);opacity:1;transform:translateY(-2px);}
+/* ═══════════════════════════════════════════
+UTILS
+═══════════════════════════════════════════ */
+.flex-between{display:flex;justify-content:space-between;align-items:center;}
+.flex-center{display:flex;align-items:center;gap:.5rem;}
+.mt-2{margin-top:.5rem;}.mt-3{margin-top:.75rem;}.mt-4{margin-top:1rem;}
+.text-muted{color:var(--gray-500);font-size:.86rem;}
+.text-danger{color:var(--danger);}.text-secondary{color:var(--secondary);}
+[dir=rtl]{text-align:right;}
+.u-divider-line{flex:1;height:2px;background:var(--gray-200);border-radius:1px;}
+#mqConfettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99999;}
+/* Section prev/next arrows */
+.sec-nav-arrows{
+display:flex;justify-content:space-between;align-items:center;
+padding:.75rem 0 .25rem;margin-top:.5rem;
+}
+.sec-nav-btn{
+width:38px;height:38px;border-radius:50%;
+border:1.5px solid var(--gray-200);background:var(--card-bg,white);
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;color:var(--gray-500);font-size:.9rem;
+transition:all .18s;
+}
+.sec-nav-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
+.sec-nav-btn:disabled{opacity:.3;cursor:default;pointer-events:none;}
+.sec-nav-spacer{flex:1;}
+
+/* ═══════════════════════════════════════════
+DARK MODE BUTTON
+═══════════════════════════════════════════ */
+#darkModeBtn{font-size:1.05rem;padding:.28rem .45rem;border-radius:6px;border:1px solid var(--gray-200);background:transparent;cursor:pointer;color:var(--gray-500);transition:color .2s,background .2s;display:flex;align-items:center;}
+#darkModeBtn:hover{background:var(--gray-100);color:var(--gray-700);}
+/* ═══════════════════════════════════════════
+DARK MODE
+═══════════════════════════════════════════ */
+[data-theme="dark"]{
+--primary:#818cf8; --primary-light:#1e1b4b; --primary-dark:#a5b4fc;
+--secondary:#34d399; --secondary-light:#064e3b;
+--danger:#f87171; --danger-light:#450a0a;
+--warning:#fbbf24; --warning-light:#451a03;
+--exam:#a78bfa; --exam-light:#2e1065;
+--written:#22d3ee; --written-light:#083344;
+--gray-50:#0f1117; --gray-100:#1a1d27; --gray-200:#252836;
+--gray-300:#363a50; --gray-400:#6b7280; --gray-500:#9ca3af;
+--gray-600:#d1d5db; --gray-700:#e5e7eb; --gray-800:#f3f4f6;
+--shadow:0 2px 8px rgba(0,0,0,.35);
+--shadow-lg:0 8px 24px rgba(0,0,0,.5);
+--card-bg:#1a1d27;
+}
+[data-theme="dark"] body{background:var(--gray-50);color:var(--gray-800);}
+[data-theme="dark"] .topbar{background:var(--card-bg);border-bottom-color:var(--gray-200);}
+[data-theme="dark"] .sidebar{background:var(--card-bg);border-right-color:var(--gray-200);}
+[data-theme="dark"] .sec-subheader{background:var(--card-bg);border-bottom-color:var(--gray-200);}
+[data-theme="dark"] .review-subnav{background:var(--card-bg);border-bottom-color:var(--gray-200);}
+[data-theme="dark"] .lib-hero{background:var(--card-bg);border-color:var(--gray-200);}
+[data-theme="dark"] .lib-desc{background:#1e2a4a;color:#a5b4fc;border-left-color:#6366f1;}
+[data-theme="dark"] .folder-group{background:var(--card-bg);border-color:var(--gray-200);}
+[data-theme="dark"] .subfolder-hd{background:var(--gray-200);border-color:var(--gray-300);}
+[data-theme="dark"] .sec-row{border-bottom-color:var(--gray-200);}
+[data-theme="dark"] .folder-reset-btn{background:var(--card-bg);}
+[data-theme="dark"] .card{background:var(--card-bg);border-color:var(--gray-200);}
+[data-theme="dark"] .card-header{border-bottom-color:var(--gray-200);}
+[data-theme="dark"] .badge-mcq-multi{background:#052e16;border-color:#166534;color:#86efac;}
+[data-theme="dark"] .badge-ordering{background:#431407;border-color:#9a3412;color:#fdba74;}
+[data-theme="dark"] .badge-matching{background:#2e1065;color:#c4b5fd;}
+[data-theme="dark"] .option-item{background:var(--gray-200);border-color:var(--gray-300);}
+[data-theme="dark"] .option-item:hover{background:var(--gray-300);}
+[data-theme="dark"] .option-item.selected{background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark);}
+[data-theme="dark"] .option-item.correct{background:var(--secondary-light);border-color:var(--secondary);color:#6ee7b7;}
+[data-theme="dark"] .option-item.incorrect{background:var(--danger-light);border-color:var(--danger);color:#fca5a5;}
+[data-theme="dark"] .option-letter{background:var(--gray-300);color:var(--gray-600);}
+[data-theme="dark"] .written-answer-box{background:var(--gray-100);}
+[data-theme="dark"] .written-answer-box textarea{background:var(--gray-200);border-color:var(--gray-300);color:var(--gray-800);}
+[data-theme="dark"] .written-answer-box textarea:disabled{background:var(--gray-100);}
+[data-theme="dark"] .written-saved{background:var(--gray-200);border-color:var(--gray-300);}
+[data-theme="dark"] .match-item{background:var(--gray-200);border-color:var(--gray-300);}
+[data-theme="dark"] .match-item:hover{background:var(--gray-300);}
+[data-theme="dark"] .match-item.selected{background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark);}
+[data-theme="dark"] .match-item.matched{background:var(--secondary-light);border-color:var(--secondary);}
+[data-theme="dark"] .match-item.match-correct{background:var(--secondary-light);border-color:var(--secondary);color:#6ee7b7;}
+[data-theme="dark"] .match-item.match-wrong{background:var(--danger-light);border-color:var(--danger);color:#fca5a5;}
+[data-theme="dark"] .ordering-item{background:var(--gray-200);border-color:var(--gray-300);}
+[data-theme="dark"] .ordering-item.ordering-correct{background:var(--secondary-light);border-color:var(--secondary);}
+[data-theme="dark"] .ordering-item.ordering-wrong{background:var(--danger-light);border-color:var(--danger);}
+[data-theme="dark"] .dm-ghost{background:var(--gray-200);}
+[data-theme="dark"] .feedback-correct{background:var(--secondary-light);border-color:var(--secondary);color:#6ee7b7;}
+[data-theme="dark"] .feedback-incorrect{background:var(--danger-light);border-color:var(--danger);color:#fca5a5;}
+[data-theme="dark"] .results-hero{background:var(--card-bg);border-color:var(--gray-200);}
+[data-theme="dark"] .chip-skip{background:var(--gray-200);color:var(--gray-600);}
+[data-theme="dark"] .checkbox-row{background:var(--gray-200);border-color:var(--gray-300);}
+[data-theme="dark"] .checkbox-row:hover{background:var(--primary-light);}
+[data-theme="dark"] .feedback-toggle label{background:var(--gray-200);border-color:var(--gray-300);}
+[data-theme="dark"] .feedback-toggle label:hover{background:var(--primary-light);}
+[data-theme="dark"] .shuffle-toggle{background:var(--gray-200);border-color:var(--gray-300);}
+[data-theme="dark"] .timer-input-row input{background:var(--gray-200);border-color:var(--gray-300);color:var(--gray-800);}
+[data-theme="dark"] .dlg-overlay{background:rgba(0,0,0,.65);}
+[data-theme="dark"] .dlg-sheet{background:var(--card-bg);}
+[data-theme="dark"] .btn-outline{background:var(--card-bg);border-color:var(--gray-300);color:var(--gray-600);}
+[data-theme="dark"] .btn-outline:hover{background:var(--gray-200);}
+[data-theme="dark"] .btn-icon:hover{background:var(--gray-200);}
+[data-theme="dark"] .snav-item:hover{background:var(--gray-200);}
+[data-theme="dark"] .snav-item.active{background:var(--primary-light);color:var(--primary-dark);}
+[data-theme="dark"] .sec-nav-btn{background:var(--card-bg);border-color:var(--gray-200);}
+[data-theme="dark"] .sec-nav-btn:hover{background:var(--primary-light);border-color:var(--primary);color:var(--primary);}
+[data-theme="dark"] #darkModeBtn{color:var(--gray-500);border-color:var(--gray-200);}
+[data-theme="dark"] #darkModeBtn:hover{background:var(--gray-200);color:var(--gray-700);}
+[data-theme="dark"] .sec-description-inline{background:#1e2a4a !important;color:#a5b4fc !important;border-color:#6366f1 !important;}
+.watermark{text-align:center;padding:.4rem .4rem .25rem;border-top:1px solid var(--gray-200);margin-top:.3rem;user-select:none;overflow:hidden;transition:padding .2s ease;}
+.watermark .wm-toggle{display:flex;align-items:center;justify-content:center;gap:.3rem;cursor:pointer;padding:.1rem .35rem;border-radius:999px;transition:background .15s;width:fit-content;margin:0 auto;}
+.watermark .wm-toggle:hover{background:var(--gray-100);}
+.watermark .wm-copy{font-size:.61rem;color:var(--gray-400);letter-spacing:.02em;line-height:1;}
+.watermark .wm-chevron{font-size:.48rem;color:var(--gray-300);transition:transform .2s ease;line-height:1;}
+.watermark .wm-details{overflow:hidden;max-height:3rem;transition:max-height .22s ease,opacity .2s ease,margin-top .2s ease;opacity:1;margin-top:.28rem;}
+.watermark.wm-collapsed .wm-details{max-height:0;opacity:0;margin-top:0;}
+.watermark.wm-collapsed{padding:.22rem .4rem .15rem;}
+.watermark.wm-collapsed .wm-chevron{transform:rotate(180deg);}
+.watermark .wm-name{font-size:.7rem;font-weight:700;color:var(--gray-500);direction:rtl;display:block;line-height:1.5;}
+.watermark .wm-dua{font-size:.61rem;color:var(--gray-400);direction:rtl;display:block;font-style:italic;line-height:1.5;}
+[data-theme="dark"] .watermark .wm-toggle:hover{background:var(--gray-200);}
+[data-theme="dark"] .watermark .wm-name{color:var(--gray-400);}
+[data-theme="dark"] .watermark .wm-copy,[data-theme="dark"] .watermark .wm-dua{color:var(--gray-500);}
+</style>
+</head>
+<body>
+<!-- ═══════════════════════════════════════════
+TOP BAR
+═══════════════════════════════════════════ -->
+<div class="topbar" id="topbar">
+<button class="topbar-menu" id="menuBtn" onclick="toggleSidebar()" title="Menu">
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+</button>
+<span class="topbar-title" id="topbar-title">Quiz</span>
+<div class="topbar-right" id="topbar-right">
+<!-- context buttons injected here -->
+</div>
+<button id="darkModeBtn" onclick="toggleDarkMode()" title="Toggle dark mode"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
+</div>
+<div class="app">
+<!-- ═══════════════════════════════════════
+SIDEBAR
+═══════════════════════════════════════ -->
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div class="sidebar-logo" id="sb-logo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+<span class="sidebar-quiz-title" id="sb-quiz-title">Quiz</span>
+<button class="sidebar-desktop-toggle" type="button" data-aywa-sidebar-toggle title="Collapse sidebar" aria-label="Collapse sidebar" aria-expanded="true"><i class="fas fa-angles-left"></i></button>
+<button class="sidebar-close" onclick="closeSidebar()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+</div>
+<!-- Nav items: Sections / Exam / Review -->
+<div class="sidebar-nav">
+<div class="snav-item" id="snav-home" onclick="goToLibrary()">
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg> Home
+</div>
+<div class="snav-item active" id="snav-lib" onclick="navTo('library')">
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2V3zm20 0h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7V3z"/></svg> Sections
+</div>
+<div class="snav-item" id="snav-exam" onclick="navTo('exam')">
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 1 0 0 18A9 9 0 0 0 12 2zm0 4v5l3 3-1.4 1.4L10 12.8V6h2zM9 1h6v2H9V1z"/></svg> Exam Mode
+</div>
+<div class="snav-item" id="snav-review" onclick="navTo('review')">
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A6.5 6.5 0 0 0 3 8.5c0 1.8.73 3.42 1.9 4.6A5 5 0 0 0 7 19h10a5 5 0 0 0 2.1-9.54A6.5 6.5 0 0 0 9.5 2z"/></svg> Smart Review
+<span class="snav-badge" id="snav-review-badge" style="display:none;"></span>
+</div>
+<div class="snav-divider"></div>
+</div>
+<!-- Sections tree -->
+<div class="sidebar-sections" id="sb-sections"></div>
+<div class="watermark" id="mqWatermark">
+<div class="wm-toggle" onclick="_wmToggle('mqWatermark')" title="إخفاء / إظهار">
+<span class="wm-copy">© يالاكويز</span>
+<span class="wm-chevron">▲</span>
+</div>
+<div class="wm-details">
+<span class="wm-name" dir="ltr">Made by Sarah Alaa</span>
+<span class="wm-dua" dir="ltr">Contacts, WhatsApp user name: @saraalaa3</span>
+</div>
+</div>
+</div>
+<div class="sidebar-resize-handle" data-aywa-sidebar-resize role="separator" tabindex="0" aria-orientation="vertical" aria-label="Resize sidebar. Double click to collapse or expand."></div>
+<!-- Overlay for mobile -->
+<div class="sidebar-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+<!-- ═══════════════════════════════════════
+MAIN AREA
+═══════════════════════════════════════ -->
+<div class="main" id="main">
+<!-- LIBRARY SCREEN -->
+<div class="screen active" id="sc-library">
+<div class="content-area">
+<div class="container" id="lib-body"></div>
+</div>
+</div>
+<!-- NORMAL / SECTION SCREEN -->
+<div class="screen" id="sc-normal">
+<div class="sec-subheader" id="sec-subheader">
+<div class="sec-prog-row">
+<span id="nm-prog-label">0 / 0 answered</span>
+<span id="nm-prog-pct" style="font-weight:700;color:var(--primary);">0%</span>
+</div>
+<div class="sec-prog-bar-wrap">
+<div class="sec-prog-bar-fill" id="nm-progbar" style="width:0%"></div>
+</div>
+</div>
+<div class="content-area" id="nm-body"></div>
+</div>
+<!-- EXAM SETUP SCREEN -->
+<div class="screen" id="sc-exam-setup">
+<div class="content-area">
+<div class="container">
+<div class="modal-section">
+<label class="modal-label"><span style="margin-right:.35rem;color:var(--primary);"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>Select Sections</label>
+<div class="checkbox-group" id="es-sections"></div>
+</div>
+<div class="modal-section">
+<label class="modal-label"><span style="margin-right:.35rem;color:var(--primary);"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6"/></svg></span>Options</label>
+<div style="display:flex;flex-direction:column;gap:.5rem;">
+<label class="shuffle-toggle">
+<input type="checkbox" id="opt-shuffle" checked>
+<span style="font-size:.88rem;font-weight:600;flex:1;">Shuffle questions &amp; answers</span>
+</label>
+<div class="modal-label" style="margin:.35rem 0 .3rem;">Feedback Mode</div>
+<div class="feedback-toggle">
+<label><input type="radio" name="fbmode" value="instant" checked> ⚡ Instant Feedback</label>
+<label><input type="radio" name="fbmode" value="end"> 🏁 Show at End</label>
+</div>
+<div class="timer-input-row" style="margin-top:.35rem;">
+<span class="text-muted">Timer:</span>
+<input type="number" id="opt-timer" min="0" max="300" value="0">
+<span class="text-muted">min (0 = none)</span>
+</div>
+</div>
+</div>
+<button class="btn btn-exam" style="width:100%;justify-content:center;font-size:.95rem;padding:.8rem;" onclick="startExam()">
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg> Start Exam
+</button>
+</div>
+</div>
+</div>
+<!-- EXAM IN-PROGRESS SCREEN -->
+<div class="screen" id="sc-exam">
+<div class="exam-header-sub">
+<div class="exam-prog-wrap">
+<div class="exam-prog-label">
+<span id="exam-ans-lbl">0 / 0</span>
+<span id="exam-pct-lbl">0%</span>
+</div>
+<div class="exam-prog-bar"><div class="exam-prog-fill" id="exam-prog-fill" style="width:0%"></div></div>
+</div>
+<span id="exam-timer" class="timer-badge" style="display:none;"></span>
+</div>
+<div class="content-area" id="exam-body"></div>
+</div>
+<!-- RESULTS SCREEN -->
+<div class="screen" id="sc-results">
+<div class="content-area">
+<div class="container">
+<div class="results-hero">
+<div class="results-score" id="res-score">—</div>
+<div class="results-label">correct answers</div>
+<div class="results-chips" id="res-chips"></div>
+</div>
+<div id="res-body"></div>
+</div>
+</div>
+</div>
+<!-- SMART REVIEW SCREEN -->
+<div class="screen" id="sc-review">
+<div class="review-subnav">
+<div class="review-tab both-tab active" id="rt-both" onclick="setRevFilter('both')">All</div>
+<div class="review-tab incorrect-tab" id="rt-inc" onclick="setRevFilter('incorrect')">✗ Mistakes</div>
+<div class="review-tab bookmark-tab" id="rt-bkm" onclick="setRevFilter('bookmarks')">🔖 Saved</div>
+</div>
+<div class="content-area" id="rev-body"></div>
+</div>
+</div><!-- /main -->
+</div><!-- /app -->
+<!-- Scroll FAB -->
+<button id="scrollFab" onclick="scrollFabClick()" title="Scroll">
+<svg id="scrollFabIcon" class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m7-7-7 7-7-7"/></svg>
+</button>
+<!-- Dialog -->
+<div class="dlg-overlay hidden" id="dlg" onclick="if(event.target===this)_dlgNo()">
+<div class="dlg-sheet">
+<div class="dlg-title" id="dlg-title">Confirm</div>
+<div class="dlg-msg" id="dlg-msg"></div>
+<div class="dlg-actions">
+<button class="btn btn-outline" onclick="_dlgNo()" id="dlg-no">Cancel</button>
+<button class="btn btn-danger" onclick="_dlgYes()" id="dlg-yes">Confirm</button>
+</div>
+</div>
+</div>
+<script>
+/* ════════════════════════════════════════════
+SAMPLE DATA — replaced at export time
+════════════════════════════════════════════ */var QUIZ_TITLE = "Psychology of women";
+var QUIZ_DESCRIPTION = "";
+var QUIZ_HOME_MEDIA_START = [];
+var QUIZ_HOME_MEDIA_END = [];
+var QUIZ_FOLDERS = [
+  {
+    "name": "علم نفس المرأه",
+    "color": "",
+    "description": "",
+    "sections": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "subfolders": []
+  }
+];
+var QUIZ_UNGROUPED = [];
+var QUIZ_SECTIONS = [
+  {
+    "id": "s5",
+    "title": "1_ Psychology of women",
+    "description": "",
+    "questions": [
+      {
+        "id": "imp_1793887737907_fb247l_0",
+        "type": "mcq",
+        "text": "A psychologist notices that some psychology textbooks describe men as strong leaders and women as emotional caregivers. She decides to examine whether these descriptions present women fairly. Which area is she mainly concerned with?",
+        "color": "",
+        "options": [
+          "Physical development across the female life cycle",
+          "Critical analysis of the portrayal of women in psychology",
+          "The influence of heredity on behavior",
+          "Work–life integration"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_megpzb_1",
+        "type": "mcq",
+        "text": "A researcher studies how a woman's experiences may be affected by her sex, age, social class, and national origin at the same time. Which concept best describes this approach?",
+        "color": "",
+        "options": [
+          "Gender stereotyping",
+          "Nature versus nurture",
+          "Intersectionality",
+          "Personal space"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_vsi38t_2",
+        "type": "mcq",
+        "text": "A government uses research findings to develop policies that help parents balance their jobs and family responsibilities. This is an example of research contributing to:",
+        "color": "",
+        "options": [
+          "Policy-making",
+          "Physical development",
+          "Nonverbal communication",
+          "Intimate relationships"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_i5zaof_3",
+        "type": "mcq",
+        "text": "A psychologist is invited to court to provide professional evidence in a case involving sexual harassment. What role is the psychologist performing?",
+        "color": "",
+        "options": [
+          "Conducting career counseling",
+          "Studying cultural differences",
+          "Providing reproductive healthcare",
+          "Serving as an expert witness"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_7oxvva_4",
+        "type": "mcq",
+        "text": "A university investigates whether women and men have equal opportunities to make decisions and hold influential positions. Which issue is most directly related to this investigation?",
+        "color": "",
+        "options": [
+          "Differences in personal space",
+          "Inequality in social and institutional power",
+          "The influence of punctuality",
+          "Physical development"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_3ecdvw_5",
+        "type": "mcq",
+        "text": "A school counselor notices that students believe certain careers are suitable only for men, while other careers are suitable only for women. Which issue does this situation illustrate?",
+        "color": "",
+        "options": [
+          "Gender stereotyping",
+          "Reproductive health",
+          "Heredity",
+          "Physical development"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_5m31d9_6",
+        "type": "mcq",
+        "text": "A researcher observes that people from different cultures prefer different distances when talking to others. Which cultural factor is being studied?",
+        "color": "",
+        "options": [
+          "Value of education",
+          "Punctuality",
+          "Personal space",
+          "Work–life integration"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_d2cd6h_7",
+        "type": "mcq",
+        "text": "A psychologist studies women's physical development, mental health, sexuality, and reproductive health. Which field is most closely related to these topics?",
+        "color": "",
+        "options": [
+          "Cultural geography",
+          "Educational administration",
+          "Experimental biology only",
+          "Psychology of women"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_u32461_8",
+        "type": "mcq",
+        "text": "A researcher studies how women use spoken language and body language when communicating with other people. Which topic is most relevant?",
+        "color": "",
+        "options": [
+          "Verbal and nonverbal communication",
+          "Institutional power",
+          "Physical development",
+          "Child abduction"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_sqp5fa_9",
+        "type": "mcq",
+        "text": "In a particular community, arriving on time is considered very important, and people are expected to follow this rule. Which factor helps explain this behavior?",
+        "color": "",
+        "options": [
+          "Heredity alone",
+          "Culture and social norms",
+          "Physical development",
+          "Reproductive rights"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_dmifpe_10",
+        "type": "mcq",
+        "text": "A psychologist studies how women's experiences in close relationships may be affected by social expectations and differences in power. Which topic is most relevant?",
+        "color": "",
+        "options": [
+          "Personal space only",
+          "Physical development only",
+          "Women and intimate relationships",
+          "The value of education only"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_g3oz86_11",
+        "type": "mcq",
+        "text": "A company investigates why women have fewer opportunities to become managers, even when they have the necessary qualifications. Which topics are most relevant to understanding this situation?",
+        "color": "",
+        "options": [
+          "Personal space and punctuality",
+          "Physical development and heredity only",
+          "Reproductive health only",
+          "Women, leadership, gender, and power"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_mhcley_12",
+        "type": "mcq",
+        "text": "A researcher wants to understand whether a person's behavior is influenced by inherited characteristics, environmental conditions, or both. Which concept is being examined?",
+        "color": "",
+        "options": [
+          "Nature versus nurture",
+          "Intersectionality",
+          "Work–life integration",
+          "Gender stereotyping"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_keomrd_13",
+        "type": "mcq",
+        "text": "Research shows that many working parents need affordable childcare. Policymakers use these findings to improve daycare services. What does this example demonstrate?",
+        "color": "",
+        "options": [
+          "Culture has no effect on behavior",
+          "Research can help guide social policies",
+          "Heredity determines every behavior",
+          "Psychology is limited to laboratory experiments"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_z8vwv2_14",
+        "type": "mcq",
+        "text": "A psychologist studies a woman's mental health while considering her family situation, social expectations, and the political conditions of her community. Which approach is most suitable?",
+        "color": "",
+        "options": [
+          "Studying biological factors only",
+          "Ignoring environmental influences",
+          "Understanding the individual within a broader social and political context",
+          "Studying personal space as the only cause of behavior"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_50fwd0_15",
+        "type": "mcq",
+        "text": "A teacher notices that students from different cultural backgrounds may have different attitudes toward the importance of education. Which concept best explains these differences?",
+        "color": "",
+        "options": [
+          "Reproductive rights",
+          "Physical development",
+          "Expert testimony",
+          "Culture shaping behavior"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_nk583w_16",
+        "type": "mcq",
+        "text": "A psychologist is asked to provide professional evidence in a court case involving intimate partner violence. How is the psychologist contributing to the field?",
+        "color": "",
+        "options": [
+          "Applying psychological knowledge in legal cases",
+          "Studying punctuality in the workplace",
+          "Examining the value of education",
+          "Investigating physical development only"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_azvbsp_17",
+        "type": "mcq",
+        "text": "A researcher studies how a woman's experiences may differ depending on her age, ability, social class, and national origin. Which concept is most appropriate?",
+        "color": "",
+        "options": [
+          "Personal space",
+          "Intersectionality",
+          "Nature versus nurture",
+          "Nonverbal communication"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_wj0jgt_18",
+        "type": "mcq",
+        "text": "A researcher investigates the difficulties women may face when trying to manage their careers and family responsibilities. Which topic is most directly related?",
+        "color": "",
+        "options": [
+          "Personal space",
+          "Physical development only",
+          "Career psychology and work–life integration",
+          "Heredity alone"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_onxuqy_19",
+        "type": "mcq",
+        "text": "A discipline studies women's experiences and critically examines gender inequality while considering the wider social and political environment. What is another name for this discipline?",
+        "color": "",
+        "options": [
+          "Behavioral biology",
+          "Social medicine",
+          "Developmental science",
+          "Feminist psychology"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "q_1793887834485_1_vvcs4d3em",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "True or False",
+        "dividerColor": "#eab308"
+      },
+      {
+        "id": "imp_1793887737907_gmbpzz_20",
+        "type": "tf",
+        "text": "The psychology of women recognizes that women and men may experience inequality in social and institutional power.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_paxk84_21",
+        "type": "tf",
+        "text": "The psychology of women focuses only on biological differences and does not consider social or political factors.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_2cfqi9_22",
+        "type": "tf",
+        "text": "Intersectionality examines how factors such as sex, race, age, social class, ability, and national origin may affect women's experiences.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_s7q6mh_23",
+        "type": "tf",
+        "text": "Research in the psychology of women can help policymakers address issues such as daycare and work–life integration.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_4bspxc_24",
+        "type": "tf",
+        "text": "Psychologists working in this field may serve as expert witnesses in cases involving sexual harassment and discrimination.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_t6x0a4_25",
+        "type": "tf",
+        "text": "Culture has no influence on personal space, punctuality, or social norms.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_lt3n7e_26",
+        "type": "tf",
+        "text": "Reproductive health, sexuality, and reproductive rights are among the topics studied in the psychology of women.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_x86f7v_27",
+        "type": "tf",
+        "text": "The nature-versus-nurture concept concerns the influence of heredity and environment on behavior.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_baqxjt_28",
+        "type": "tf",
+        "text": "Critically examining how women are portrayed in psychology is not part of the psychology of women.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_zmi4qi_29",
+        "type": "tf",
+        "text": "Feminist psychology aims to understand individuals within the broader social and political aspects of society.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "q_1793887848539_2_z0flf6rgd",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "ESSAY",
+        "dividerColor": "#eab308"
+      },
+      {
+        "id": "imp_1793887737907_pjluh3_30",
+        "type": "written",
+        "text": "Give examples on what psychology of women addresses (at least 3).",
+        "color": "",
+        "modelAnswer": "1. Gender stereotyping.\n2. Physical development across the female life cycle.\n3. Mental health.\n4. Women’s health issues.\n5. Sexuality.\n6. Reproductive rights.\n7. Reproductive health."
+      }
+    ]
+  },
+  {
+    "id": "s6",
+    "title": "2 _ The Adolescent Girl",
+    "description": "",
+    "questions": [
+      {
+        "id": "imp_1793887737907_e5e2yk_0",
+        "type": "mcq",
+        "text": "1. Which of the following best defines adolescence?",
+        "color": "",
+        "options": [
+          "The period between birth and puberty",
+          "The phase of life between childhood and adulthood",
+          "The period of complete physical maturity",
+          "The stage of emotional stability"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_qeegyt_1",
+        "type": "mcq",
+        "text": "2. A 13-year-old girl is experiencing rapid physical changes and is beginning to question her identity. Which stage of adolescence is she in?",
+        "color": "",
+        "options": [
+          "Late adolescence",
+          "Middle adolescence",
+          "Early adolescence",
+          "Adulthood"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_6ltraw_2",
+        "type": "mcq",
+        "text": "3. Which of the following is considered a biological change associated with puberty?",
+        "color": "",
+        "options": [
+          "Increased need for social acceptance",
+          "Development of abstract thinking",
+          "Formation of personal identity",
+          "Redistribution of body fat"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_ihrhj7_3",
+        "type": "mcq",
+        "text": "4. A girl feels embarrassed about her changing body and frequently compares herself with her classmates. This is mainly related to:",
+        "color": "",
+        "options": [
+          "Cognitive impairment",
+          "The psychological effects of puberty",
+          "Delayed physical development",
+          "Emotional maturity"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_zzvevv_4",
+        "type": "mcq",
+        "text": "5. Menarche refers to:",
+        "color": "",
+        "options": [
+          "The onset of breast development",
+          "The first menstrual period",
+          "The beginning of pubic hair growth",
+          "The completion of puberty"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_n6nv0u_5",
+        "type": "mcq",
+        "text": "6. Which of the following may influence an adolescent girl's understanding of menarche?",
+        "color": "",
+        "options": [
+          "Family beliefs and cultural background",
+          "Height and weight only",
+          "Physical activity only",
+          "Her ability to perform daily activities"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_yzlak1_6",
+        "type": "mcq",
+        "text": "7. A nurse is providing menstrual health education to a 12-year-old girl. Which action is most appropriate?",
+        "color": "",
+        "options": [
+          "Avoid discussing menstrual symptoms",
+          "Explain that all menstrual pain is normal",
+          "Provide clear, age-appropriate information",
+          "Encourage the girl to discuss her concerns only with friends"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_ftb78o_7",
+        "type": "mcq",
+        "text": "8. Which cognitive ability becomes more developed during adolescence?",
+        "color": "",
+        "options": [
+          "Dependence on concrete experiences only",
+          "Abstract thinking and considering different viewpoints",
+          "Inability to compare explanations",
+          "Complete freedom from emotional influences"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_lj6bzb_8",
+        "type": "mcq",
+        "text": "9. An adolescent girl asks herself, “Who am I, and what do I want to become?” This question is mainly related to:",
+        "color": "",
+        "options": [
+          "Self-esteem",
+          "Impulse control",
+          "Identity",
+          "Social acceptance"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_lckwi0_9",
+        "type": "mcq",
+        "text": "10. Which statement best describes self-esteem?",
+        "color": "",
+        "options": [
+          "How an individual values herself",
+          "How an individual understands abstract ideas",
+          "How an individual separates from her family",
+          "How an individual responds to peer pressure"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_e0d9x5_10",
+        "type": "mcq",
+        "text": "11. An adolescent girl wants to make more decisions independently from her parents. This is an example of:",
+        "color": "",
+        "options": [
+          "Social withdrawal",
+          "Psychological separation and autonomy",
+          "Emotional instability",
+          "Decreased self-concept"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_knbhv2_11",
+        "type": "mcq",
+        "text": "12. Which of the following is an important characteristic of social development during adolescence?",
+        "color": "",
+        "options": [
+          "Complete rejection of family relationships",
+          "Decreased importance of peer relationships",
+          "Increased need for independence and social acceptance",
+          "Avoidance of all social interactions"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_m8or6i_12",
+        "type": "mcq",
+        "text": "13. A girl starts smoking because her friends encourage her to do so. This behavior is an example of:",
+        "color": "",
+        "options": [
+          "Positive self-concept",
+          "Peer influence",
+          "Emotional regulation",
+          "Cognitive development"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_p4kg17_13",
+        "type": "mcq",
+        "text": "14. Which of the following is a common menstrual problem during adolescence?",
+        "color": "",
+        "options": [
+          "Dysmenorrhea",
+          "Hypertension",
+          "Asthma",
+          "Hypoglycemia"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_3xal3n_14",
+        "type": "mcq",
+        "text": "15. An adolescent girl has been experiencing persistent sadness and has stopped participating in her usual activities. What should the nurse do first?",
+        "color": "",
+        "options": [
+          "Reassure her that all emotional changes are normal",
+          "Ignore the behavior unless the family complains",
+          "Assess the severity, duration, and effect on functioning",
+          "Advise her to spend more time with friends"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_fr8p1k_15",
+        "type": "mcq",
+        "text": "16. Which of the following may indicate a psychological concern in an adolescent girl?",
+        "color": "",
+        "options": [
+          "Developing abstract thinking",
+          "Increasing independence",
+          "Forming new friendships",
+          "Persistent anxiety and social withdrawal"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_3ubc4f_16",
+        "type": "mcq",
+        "text": "17. During an adolescent health assessment, the nurse should:",
+        "color": "",
+        "options": [
+          "Focus only on physical changes",
+          "Assess physical, psychological, and social concerns",
+          "Avoid discussing emotional problems",
+          "Allow parents to answer all questions"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_8u4d4u_17",
+        "type": "mcq",
+        "text": "18. Which nursing action helps establish a therapeutic relationship with an adolescent girl?",
+        "color": "",
+        "options": [
+          "Listening without unnecessary judgment",
+          "Criticizing her personal choices",
+          "Avoiding sensitive topics",
+          "Making decisions without involving her"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_x1pm9b_18",
+        "type": "mcq",
+        "text": "19. A nurse notices that an adolescent girl is experiencing severe menstrual pain that affects her daily activities. What is the most appropriate action?",
+        "color": "",
+        "options": [
+          "Tell her that menstrual pain is always normal",
+          "Advise her to avoid discussing the problem",
+          "Assess her symptoms and arrange further evaluation when needed",
+          "Reassure her without performing an assessment"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_b9n55w_19",
+        "type": "mcq",
+        "text": "20. Which statement about adolescent development is correct?",
+        "color": "",
+        "options": [
+          "Adolescence is only a biological process",
+          "All adolescent girls develop at exactly the same age",
+          "Psychological development begins after puberty is completed",
+          "Physical, cognitive, psychological, and social development occur together"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "q_1793887949626_5_0jc56o7gj",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "True or False",
+        "dividerColor": "#ef4444"
+      },
+      {
+        "id": "imp_1793887737907_9vniqo_20",
+        "type": "tf",
+        "text": "Adolescence is generally defined as the period between 10 and 19 years of age.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_to9410_21",
+        "type": "tf",
+        "text": "All adolescent girls experience the same psychological changes at the same age.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_h2u3yp_22",
+        "type": "tf",
+        "text": "Puberty is a biological process that may also have psychological and social effects.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_svkpnq_23",
+        "type": "tf",
+        "text": "Menarche is only a physical event and has no emotional significance.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_mg7wc3_24",
+        "type": "tf",
+        "text": "An adolescent girl's body image may be influenced by how she thinks others see her.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_nns0dr_25",
+        "type": "tf",
+        "text": "Abstract thinking allows adolescents to consider possibilities and “what if” situations.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_l6qgp4_26",
+        "type": "tf",
+        "text": "Peer relationships become less important during adolescence.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_i1ksvu_27",
+        "type": "tf",
+        "text": "Persistent emotional distress and functional impairment should be assessed by the nurse.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_zg4s10_28",
+        "type": "tf",
+        "text": "The nurse should avoid discussing menstrual concerns because they may cause embarrassment.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_mji9ei_29",
+        "type": "tf",
+        "text": "A therapeutic relationship with an adolescent girl is based on trust and respectful communication.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "q_1793887927943_4_x465ow9ma",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "ESSAY",
+        "dividerColor": "#ef4444"
+      },
+      {
+        "id": "imp_1793887737907_1vj2uz_30",
+        "type": "written",
+        "text": "Mention the role of the nurse in caring for adolescent girls.",
+        "color": "",
+        "modelAnswer": "1. Provide health education.\n2. Listen to the girl’s concerns without judgment.\n3. Assess physical, psychological, and social problems.\n4. Provide emotional support.\n5. Refer the girl to a specialist when needed."
+      }
+    ]
+  },
+  {
+    "id": "s7",
+    "title": "3 _ Psychological changes during menstruation",
+    "description": "",
+    "questions": [
+      {
+        "id": "imp_1793887737906_pki8js_0",
+        "type": "mcq",
+        "text": "Which factor mainly explains mood changes during the menstrual cycle ?",
+        "color": "",
+        "options": [
+          "Changes in body temperature",
+          "fluctuations in hormone levels",
+          "Changes in blood pressure",
+          "Decreased oxygen supply"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737906_vm4512_1",
+        "type": "mcq",
+        "text": "How can hormonal fluctuations influence emotional stability?",
+        "color": "",
+        "options": [
+          "By changing serotonin levels in the brain",
+          "By stopping all neurotransmitter activity",
+          "By increasing blood pressure",
+          "By preventing hormone secretion"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737906_bkfd7h_2",
+        "type": "mcq",
+        "text": "Emotional health is a combination of:",
+        "color": "",
+        "options": [
+          "Diet, exercise, and sleep only",
+          "Estrogen and progesterone only",
+          "The brain, hormones, and life experiences",
+          "The reproductive organs alone"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737906_qiuo9g_3",
+        "type": "mcq",
+        "text": "Which hormone is called the star of the show?",
+        "color": "",
+        "options": [
+          "Testosterone",
+          "Progesterone",
+          "Insulin",
+          "Estrogen"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737906_w51jxk_4",
+        "type": "mcq",
+        "text": "Which of the following is an effect associated with estrogen?",
+        "color": "",
+        "options": [
+          "It eliminates the need for sleep",
+          "It influences memory and motivation",
+          "It prevents all emotional responses",
+          "It stops the release of endorphins"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737906_jr248i_5",
+        "type": "mcq",
+        "text": "Which statement about testosterone in women is correct?",
+        "color": "",
+        "options": [
+          "Women have higher levels than men",
+          "It is absent in women",
+          "It affects only memory",
+          "Women have much lower levels than men"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737906_wl9ijp_6",
+        "type": "mcq",
+        "text": "The limbic brain is associated with:",
+        "color": "",
+        "options": [
+          "Primary drives and emotions",
+          "Blood filtration",
+          "Bone growth only",
+          "Oxygen transport"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737906_1oxlpz_7",
+        "type": "mcq",
+        "text": "Testosterone is linked to libido through its effects on the:",
+        "color": "",
+        "options": [
+          "Cerebellum only",
+          "Limbic brain",
+          "Kidneys",
+          "Thyroid gland"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737906_eicg5x_8",
+        "type": "mcq",
+        "text": "Why is progesterone called the 'dysphoric hormone'?",
+        "color": "",
+        "options": [
+          "It increases all estrogen receptors",
+          "It prevents ovulation permanently",
+          "It decreases the number of available estrogen receptors",
+          "It raises testosterone to its highest level"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737906_nmvo8l_9",
+        "type": "mcq",
+        "text": "During which phase do estrogen and testosterone rise during the first two weeks?",
+        "color": "",
+        "options": [
+          "Luteal phase",
+          "Menopause",
+          "Ovulation only",
+          "Follicular phase"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737906_bilf5l_10",
+        "type": "mcq",
+        "text": "Which combination is associated with the follicular phase?",
+        "color": "",
+        "options": [
+          "Clear thinking, higher motivation, and increased energy",
+          "Reduced motivation and fatigue in every woman",
+          "Progesterone acting alone",
+          "The lowest levels of all hormones"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737906_49gsy7_11",
+        "type": "mcq",
+        "text": "What happens to endorphins during the follicular phase?",
+        "color": "",
+        "options": [
+          "They are permanently depleted",
+          "They are released",
+          "They are replaced by progesterone",
+          "They stop influencing the brain"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737906_g103pl_12",
+        "type": "mcq",
+        "text": "At ovulation, which hormones or substances reach their highest levels?",
+        "color": "",
+        "options": [
+          "Progesterone, insulin, and cortisol",
+          "Estrogen, endorphins, and testosterone",
+          "Progesterone and insulin only",
+          "Estrogen and progesterone only"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737906_co4m6v_13",
+        "type": "mcq",
+        "text": "If pregnancy does not occur, which structure secretes progesterone and estrogen during the luteal phase?",
+        "color": "",
+        "options": [
+          "The pituitary gland",
+          "The empty follicle",
+          "The adrenal medulla only",
+          "The thyroid gland"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737906_h5ae2a_14",
+        "type": "mcq",
+        "text": "Why might mood and thinking decline during the luteal phase?",
+        "color": "",
+        "options": [
+          "Testosterone remains at its peak",
+          "Feel-good hormones recede and progesterone decreases estrogen receptors",
+          "Estrogen receptors multiply rapidly",
+          "Endorphins remain at their highest levels"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737906_stcydv_15",
+        "type": "mcq",
+        "text": "Which of the following is mainly responsible for mood swings related to menstruation?",
+        "color": "",
+        "options": [
+          "Psychological factors",
+          "Physical factors",
+          "Social factors",
+          "Environmental factors"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737906_cmwbg4_16",
+        "type": "mcq",
+        "text": "What are the physical causes of mood swings related to menstruation?",
+        "color": "",
+        "options": [
+          "Daily stress and life experiences only",
+          "Social relationships and family problems",
+          "Hormonal fluctuations during the menstrual cycle",
+          "Environmental changes only"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737906_tatgin_17",
+        "type": "mcq",
+        "text": "Which hormonal change shortly before bleeding begins, contribute to mood swings?",
+        "color": "",
+        "options": [
+          "A sudden rise in all hormones",
+          "A permanent increase in estrogen",
+          "A drop in estrogen and progesterone",
+          "A complete absence of testosterone throughout life"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737906_155aqb_18",
+        "type": "mcq",
+        "text": "Which group contains external factors that may contribute to mood swings?",
+        "color": "",
+        "options": [
+          "Water, oxygen, and sunlight",
+          "Estrogen, progesterone, and testosterone only",
+          "Memory, perception, and motivation",
+          "Alcohol, caffeine, and other stimulants such as sugar"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737906_x3067w_19",
+        "type": "mcq",
+        "text": "A woman experiences increased energy and clearer thinking during the first two weeks. Which phase best fits this description?",
+        "color": "",
+        "options": [
+          "Luteal phase",
+          "Follicular phase",
+          "Menopause",
+          "The period after pregnancy"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "q_1793887993310_6_sdf0sms71",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "True or False",
+        "dividerColor": "#ec4899"
+      },
+      {
+        "id": "imp_1793887737906_6sw5l6_20",
+        "type": "tf",
+        "text": "Estrogen can influence perception, anxiety, and sexual desire.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737906_suj9x1_21",
+        "type": "tf",
+        "text": "Women normally have higher levels of testosterone than men.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737906_s6p45s_22",
+        "type": "tf",
+        "text": "Progesterone decreases the number of available estrogen receptors.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737906_4046ek_23",
+        "type": "tf",
+        "text": "During the follicular phase, endorphins are released along with rising estrogen and testosterone levels.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737906_415b4k_24",
+        "type": "tf",
+        "text": "The limbic brain is involved in primary drives and emotions, including libido.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737906_slksqe_25",
+        "type": "tf",
+        "text": "Emotional health depends only on hormone levels and is not affected by life experiences.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737906_cfor8s_26",
+        "type": "tf",
+        "text": "At ovulation, estrogen, endorphins, and testosterone begin to decrease after reaching their highest levels.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737906_dvue8t_27",
+        "type": "tf",
+        "text": "Estrogen and progesterone are secreted by the empty follicle during the luteal phase if pregnancy does not occur.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737906_599m6g_28",
+        "type": "tf",
+        "text": "Daily stress and fatigue contribute to emotional instability during the menstrual cycle.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737906_s747bb_29",
+        "type": "tf",
+        "text": "Insomnia and sleep apnea cannot contribute to mood swings.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "q_1793888017718_7_m0qzu8vny",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "ESSAY",
+        "dividerColor": "#ec4899"
+      },
+      {
+        "id": "imp_1793887737906_l7nkya_30",
+        "type": "written",
+        "text": "List the three phases of the menstrual cycle and the main hormonal changes in each phase.",
+        "color": "",
+        "modelAnswer": "1- Follicular phase: Estrogen and testosterone rise, and endorphins are released, increasing energy, motivation, and clear thinking.\n2- Ovulation: Estrogen, endorphins, and testosterone reach their highest levels.\n3- Luteal phase: Estrogen and endorphins decrease, while progesterone is secreted. It decreases available estrogen receptors, which may affect mood and thinking."
+      }
+    ]
+  },
+  {
+    "id": "s8",
+    "title": "4 _ Psychological changes during pregnancy",
+    "description": "",
+    "questions": [
+      {
+        "id": "imp_1793887737907_8qmtsz_0",
+        "type": "mcq",
+        "text": "The main psychological task during the second trimester is:",
+        "color": "",
+        "options": [
+          "Accepting the pregnancy",
+          "Preparing for parenthood",
+          "Accepting the baby",
+          "Recovering from childbirth"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_6rmj8z_1",
+        "type": "mcq",
+        "text": "Which of the following influences a woman's attitude toward pregnancy?",
+        "color": "",
+        "options": [
+          "Her family environment",
+          "The society and culture in which she lives",
+          "The timing of pregnancy",
+          "All of the above"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_guuh8c_2",
+        "type": "mcq",
+        "text": "In the past, heavy emphasis on medical management conveyed the idea that pregnancy was:",
+        "color": "",
+        "options": [
+          "A psychological disorder",
+          "A nine-month-long illness",
+          "A normal social event only",
+          "A family responsibility only"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_hdbf4a_3",
+        "type": "mcq",
+        "text": "Feeling both pleased and not pleased about pregnancy is called:",
+        "color": "",
+        "options": [
+          "Introversion",
+          "Emotional lability",
+          "Ambivalence",
+          "Narcissism"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_y5huyz_4",
+        "type": "mcq",
+        "text": "Which of the following is listed as an emotional response to pregnancy?",
+        "color": "",
+        "options": [
+          "Couvade syndrome",
+          "Hypertension",
+          "Anemia",
+          "Infection"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_3hubsa_5",
+        "type": "mcq",
+        "text": "Acceptance of pregnancy is usually easier when the woman:",
+        "color": "",
+        "options": [
+          "Avoids emotional support",
+          "Has confidence in the stability of her relationship with the child's father",
+          "Has no concerns about her future",
+          "Is separated from her family"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_245hu7_6",
+        "type": "mcq",
+        "text": "The main psychological task during the first trimester is:",
+        "color": "",
+        "options": [
+          "Preparing for parenthood",
+          "Accepting the baby",
+          "Accepting the pregnancy",
+          "Preparing for childbirth"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_nfjofp_7",
+        "type": "mcq",
+        "text": "Which action is recommended to help reduce mood swings?",
+        "color": "",
+        "options": [
+          "Allow small problems to grow",
+          "Increase fatigue",
+          "Ignore other people's perspectives",
+          "Set priorities to reduce stress"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_pugihv_8",
+        "type": "mcq",
+        "text": "A woman's cultural background may influence:",
+        "color": "",
+        "options": [
+          "Her beliefs and restrictions concerning activities",
+          "The role she wants to take during pregnancy",
+          "Her behavior during pregnancy",
+          "All of the above"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_26nnuq_9",
+        "type": "mcq",
+        "text": "Pregnancy brings about more psychological changes than any other life event besides:",
+        "color": "",
+        "options": [
+          "Marriage",
+          "Puberty",
+          "Menopause",
+          "Childbirth"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_hymg43_10",
+        "type": "mcq",
+        "text": "During the third trimester, the main psychological task is:",
+        "color": "",
+        "options": [
+          "Accepting the pregnancy",
+          "Recovering from the initial shock",
+          "Preparing for parenthood",
+          "Accepting the mother's family"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_1tjrn4_11",
+        "type": "mcq",
+        "text": "Which of the following is an example of an individual influence ?",
+        "color": "",
+        "options": [
+          "The color of the baby's clothing",
+          "Confidence in the stability of the relationship with the child's father",
+          "The baby's sleeping position",
+          "The number of prenatal visits"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_xezaiw_12",
+        "type": "mcq",
+        "text": "Today, healthcare settings generally view pregnancy as a time of:",
+        "color": "",
+        "options": [
+          "Isolation",
+          "Illness",
+          "Dependence",
+          "Health"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_0b4da7_13",
+        "type": "mcq",
+        "text": "During the second trimester, which of the following is common?",
+        "color": "",
+        "options": [
+          "Role-playing and increased dreaming",
+          "Complete absence of emotional changes",
+          "Preparing only for the end of pregnancy",
+          "Separation from the expected baby"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_ltgbvz_14",
+        "type": "mcq",
+        "text": "A positive family influence on pregnancy may occur when a woman:",
+        "color": "",
+        "options": [
+          "Was blamed for her parents' marital problems B. Heard only frightening stories about labor C. Was loved and viewed as the pleasant outcome of a happy marriage D. Lacks emotional support Q16. Which action is recommended to learn about a woman's cultural beliefs? A. Ignore her beliefs",
+          "Heard only frightening stories about  labor ",
+          "Was loved and viewed as the pleasant outcome of a happy marriage",
+          "Lacks emotional support"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_900ehm_15",
+        "type": "mcq",
+        "text": "Which action is recommended to learn about a woman's cultural beliefs?",
+        "color": "",
+        "options": [
+          "Ignore her beliefs",
+          "Ask about her beliefs during prenatal visits",
+          "Avoid discussing pregnancy practices",
+          "Tell her that all cultural beliefs are correct"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_avw0aq_16",
+        "type": "mcq",
+        "text": "A pregnant woman worries that pregnancy may permanently change her abdomen and breasts, affecting her appearance. This concern belongs to:",
+        "color": "",
+        "options": [
+          "Social influences",
+          "Cultural influences",
+          "Family influences",
+          "Individual influences"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_u48bi4_17",
+        "type": "mcq",
+        "text": "During the first trimester, the woman and her partner commonly:",
+        "color": "",
+        "options": [
+          "Focus mainly on preparing the baby's room",
+          "Recover from the shock of learning about the pregnancy",
+          "Become impatient with the end of pregnancy",
+          "Concentrate only on childbirth"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_81w83w_18",
+        "type": "mcq",
+        "text": "A woman's ability to cope with stress depends partly on her:",
+        "color": "",
+        "options": [
+          "Basic temperament",
+          "Baby's sleeping arrangements",
+          "Choice of clothing",
+          "Prenatal visit schedule"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_it922e_19",
+        "type": "mcq",
+        "text": "Which combination best describes the third trimester?",
+        "color": "",
+        "options": [
+          "Accepting pregnancy and recovering from shock",
+          "Accepting the baby and increased dreaming",
+          "Preparing for the baby and becoming impatient with pregnancy",
+          "Avoiding preparation for parenthood"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "q_1793888048430_8_2bswnose8",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "True or False",
+        "dividerColor": "#3b82f6"
+      },
+      {
+        "id": "imp_1793887737907_lrprz6_20",
+        "type": "tf",
+        "text": "Pregnancy brings about more psychological changes than any other life event besides puberty.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_khhz2w_21",
+        "type": "tf",
+        "text": "A woman's attitude toward pregnancy depends only on her physical condition.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_uvmvpx_22",
+        "type": "tf",
+        "text": "In the past, women were encouraged to participate actively in labor and birth.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_2n8wsk_23",
+        "type": "tf",
+        "text": "Today, women may bring their families to prenatal care visits.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_avif1j_24",
+        "type": "tf",
+        "text": "Cultural beliefs may influence a woman's behavior and activities during pregnancy.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_tc6tv7_25",
+        "type": "tf",
+        "text": "lifting the arms over the head can cause the umbilical cord to twist.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_36dewn_26",
+        "type": "tf",
+        "text": "A woman's basic temperament plays a role in her ability to adapt to the changes associated with motherhood.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_b54z9a_27",
+        "type": "tf",
+        "text": "Ambivalence means feeling both pleased and not pleased about pregnancy.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_cieejt_28",
+        "type": "tf",
+        "text": "Accepting the baby is the main psychological task of the third trimester.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_2uvc1v_29",
+        "type": "tf",
+        "text": "Avoiding fatigue and setting priorities are among the measures recommended to reduce mood swings.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "q_1793888064812_9_5zkjo2poe",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "ESSAY",
+        "dividerColor": "#3b82f6"
+      },
+      {
+        "id": "imp_1793887737907_nzen1g_30",
+        "type": "written",
+        "text": "Mention the emotional responses to pregnancy.",
+        "color": "",
+        "modelAnswer": "1. Grief.\n2. Narcissism.\n3. Introversion versus extroversion.\n4. Body image and boundary.\n5. Stress.\n6. Couvade syndrome.\n7. Emotional lability (mood swings).\n8. Changes in sexual desire.\n9. Changes in the expectant family."
+      }
+    ]
+  },
+  {
+    "id": "s9",
+    "title": "5 _ Postpartum period",
+    "description": "",
+    "questions": [
+      {
+        "id": "imp_1793887737907_qjvjak_0",
+        "type": "mcq",
+        "text": "After delivery, a mother's reproductive system gradually returns to its pre-pregnancy state. What is this period called?",
+        "color": "",
+        "options": [
+          "Prenatal period",
+          "Postpartum period",
+          "Menstrual period",
+          "Ovulation period"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_ovi7ae_1",
+        "type": "mcq",
+        "text": "During the first few days after delivery, a mother mainly wants to rest and talk about her labor experience. She depends on family members for help. Which postpartum phase is she experiencing?",
+        "color": "",
+        "options": [
+          "Taking-in phase",
+          "Taking-hold phase",
+          "Letting-go phase",
+          "Independent phase"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_9imeig_2",
+        "type": "mcq",
+        "text": "A nurse notices that a mother spends much of her time discussing her labor and birth experience instead of actively caring for her newborn. Which nursing action is most appropriate?",
+        "color": "",
+        "options": [
+          "Ask her to stop discussing the birth",
+          "Leave her to manage everything alone",
+          "Encourage her to talk about her birth experience",
+          "Tell her to focus only on feeding the baby"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_2ab0xx_3",
+        "type": "mcq",
+        "text": "A mother is in the first three days after delivery and feels exhausted, physically uncomfortable, and uncertain about newborn care. Which factor best explains her dependence on others?",
+        "color": "",
+        "options": [
+          "Complete adjustment to motherhood",
+          "Full recovery from childbirth",
+          "Increased confidence in baby care",
+          "Physical discomfort and exhaustion after childbirth"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_7owg9j_4",
+        "type": "mcq",
+        "text": "On the fifth day after delivery, a mother begins trying to care for her baby herself and wants to make her own decisions. Which phase is she most likely experiencing?",
+        "color": "",
+        "options": [
+          "Taking-in phase",
+          "Taking-hold phase",
+          "Letting-go phase",
+          "Prenatal phase"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_kd9wne_5",
+        "type": "mcq",
+        "text": "A nurse is teaching a mother how to hold her newborn safely. After demonstrating the technique, what should the nurse do next?",
+        "color": "",
+        "options": [
+          "Allow the mother to practice with watchful guidance",
+          "Perform all baby care for the mother",
+          "Avoid allowing the mother to handle the baby",
+          "Wait until the mother has completely recovered"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_oec4fb_6",
+        "type": "mcq",
+        "text": "A mother in the taking-hold phase becomes frustrated because she cannot perform all her usual activities after delivery. What is the best explanation?",
+        "color": "",
+        "options": [
+          "She has already completed her adjustment to motherhood",
+          "She no longer needs physical rest",
+          "She is eager to regain her abilities but has not fully recovered",
+          "She is necessarily experiencing postpartum psychosis"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_47iakt_7",
+        "type": "mcq",
+        "text": "Several weeks after delivery, a mother accepts her baby's actual characteristics instead of the image she imagined during pregnancy. She also adjusts to her new family role. Which phase does this describe?",
+        "color": "",
+        "options": [
+          "Taking-in phase",
+          "Taking-hold phase",
+          "Dependent phase",
+          "Letting-go phase"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_4a1zln_8",
+        "type": "mcq",
+        "text": "A new mother experiences tearfulness, irritability, and mood changes around the third to fifth day after delivery. The symptoms improve within a few days. Which condition best matches this presentation?",
+        "color": "",
+        "options": [
+          "Postpartum psychosis",
+          "Postpartum blues",
+          "Chronic depression",
+          "Taking-hold phase"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_kqdol3_9",
+        "type": "mcq",
+        "text": "A mother experiences mild sadness and mood swings shortly after childbirth. what is the main approach to managing typical postpartum blues?",
+        "color": "",
+        "options": [
+          "Supportive care and reassurance",
+          "Immediate long-term psychiatric medication for every mother",
+          "Complete separation from the newborn",
+          "Avoiding family support"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_jdxh10_10",
+        "type": "mcq",
+        "text": "A mother continues to experience low mood, loss of interest, fatigue, and difficulty sleeping for more than two weeks after delivery. Which condition should be considered?",
+        "color": "",
+        "options": [
+          "Normal adjustment only",
+          "Taking-in phase",
+          "Postpartum depression",
+          "Postpartum blues only"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_da1mxh_11",
+        "type": "mcq",
+        "text": "A mother feels worthless and believes she is failing at motherhood. She also has excessive anxiety about her baby's health. Which condition is most consistent with these symptoms?",
+        "color": "",
+        "options": [
+          "Taking-hold phase",
+          "Typical physical recovery",
+          "Postpartum blues alone",
+          "Postpartum depression"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_usvrkj_12",
+        "type": "mcq",
+        "text": "A nurse assesses a new mother and discovers that she has a history of depression and very little support at home. What should the nurse understand about these findings?",
+        "color": "",
+        "options": [
+          "They guarantee postpartum psychosis",
+          "They are risk factors for postpartum depression",
+          "They indicate that the mother has completed the letting-go phase",
+          "They rule out postpartum depression"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_74k31f_13",
+        "type": "mcq",
+        "text": "A mother has persistent postpartum depression symptoms that require professional treatment. Which approach may be used?",
+        "color": "",
+        "options": [
+          "Medication, psychotherapy, or a combination of both",
+          "Reassurance alone in every case",
+          "Avoiding assessment of symptoms",
+          "Stopping all social contact"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_vufb6p_14",
+        "type": "mcq",
+        "text": "Shortly after delivery, a mother develops severe confusion, disorganized behavior, and hallucinations. Which condition is most concerning?",
+        "color": "",
+        "options": [
+          "Taking-in phase",
+          "Postpartum blues",
+          "Postpartum psychosis",
+          "Normal adjustment to motherhood"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_sk3fju_15",
+        "type": "mcq",
+        "text": "A nurse identifies hallucinations and delusions in a woman during the first two weeks after delivery. What is the most appropriate action?",
+        "color": "",
+        "options": [
+          "Reassure her that this is always normal",
+          "Wait several weeks before taking action",
+          "Encourage her to manage the symptoms alone",
+          "Arrange urgent professional assessment and referral"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "imp_1793887737907_s2bffa_16",
+        "type": "mcq",
+        "text": "A postpartum mother is experiencing stress and low energy. Her healthcare team discusses appropriate exercise as part of her recovery. Which psychological benefit is mentioned?",
+        "color": "",
+        "options": [
+          "Guaranteed prevention of every postpartum disorder",
+          "Reduced tension and stress",
+          "Elimination of the need for sleep",
+          "Immediate resolution of all mood symptoms"
+        ],
+        "answer": 1
+      },
+      {
+        "id": "imp_1793887737907_pql717_17",
+        "type": "mcq",
+        "text": "A mother is learning to bond with her newborn, but medical complications have made the early days difficult. Which statement is consistent?",
+        "color": "",
+        "options": [
+          "Touch is an important part of bonding, even when complications occur",
+          "Bonding is impossible after a complicated delivery",
+          "Bonding depends only on feeding",
+          "The mother must wait until the baby is older to bond"
+        ],
+        "answer": 0
+      },
+      {
+        "id": "imp_1793887737907_zsuf8d_18",
+        "type": "mcq",
+        "text": "A new mother reports feeling isolated during the first months after birth. Which option may help her socialize with other postpartum mothers?",
+        "color": "",
+        "options": [
+          "Avoiding all group activities",
+          "Returning immediately to every previous activity",
+          "Participating in the PPPT program",
+          "Ignoring her feelings of isolation"
+        ],
+        "answer": 2
+      },
+      {
+        "id": "imp_1793887737907_7qjb6g_19",
+        "type": "mcq",
+        "text": "A woman experienced medical complications during pregnancy. Her nurse explains that these complications may affect her psychological recovery after delivery. Which statement is best?",
+        "color": "",
+        "options": [
+          "Complicated pregnancies always lead to psychiatric illness",
+          "Pregnancy complications cannot affect postpartum mood",
+          "Postpartum symptoms always resolve immediately",
+          "Complications may increase the likelihood or duration of blues or depression, but do not"
+        ],
+        "answer": 3
+      },
+      {
+        "id": "q_1793888113268_10_65denuhmf",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "True or False",
+        "dividerColor": "#8b5cf6"
+      },
+      {
+        "id": "imp_1793887737907_sw0ryi_20",
+        "type": "tf",
+        "text": "The postpartum period generally refers to the six-to-eight-week period after delivery during which the mother's body returns toward its pre-pregnancy state.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_rthlku_21",
+        "type": "tf",
+        "text": "During the taking-in phase, the mother is usually independent, makes all decisions confidently, and prefers to perform all newborn care herself.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_qpzfps_22",
+        "type": "tf",
+        "text": "Encouraging a mother to discuss her labor and birth experience can help her integrate the experience into her life.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_kyhzef_23",
+        "type": "tf",
+        "text": "During the taking-hold phase, the mother may become interested in caring for her baby but still feel insecure about her abilities.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_4iky0t_24",
+        "type": "tf",
+        "text": "The letting-go phase involves accepting the real baby and adjusting to the mother's new role.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_5jizdy_25",
+        "type": "tf",
+        "text": "Postpartum blues usually begin several months after delivery and always require medication.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_e4ga25_26",
+        "type": "tf",
+        "text": "Postpartum depression may involve persistent low mood, fatigue, changes in sleep or appetite, and feelings of worthlessness.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_uscuwq_27",
+        "type": "tf",
+        "text": "A history of depression and lack of social support are listed as possible risk factors for postpartum depression.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "imp_1793887737907_o57a2v_28",
+        "type": "tf",
+        "text": "Postpartum psychosis is common and can safely be managed with reassurance alone, even when hallucinations occur.",
+        "color": "",
+        "answer": "False"
+      },
+      {
+        "id": "imp_1793887737907_4uxamp_29",
+        "type": "tf",
+        "text": "Exercise may help postpartum mothers increase energy, reduce stress, and meet other mothers.",
+        "color": "",
+        "answer": "True"
+      },
+      {
+        "id": "q_1793888130515_11_2ca9qn6s8",
+        "type": "divider",
+        "text": "",
+        "color": "",
+        "dividerLabel": "ESSAY",
+        "dividerColor": "#8b5cf6"
+      },
+      {
+        "id": "imp_1793887737907_qmsqjc_30",
+        "type": "written",
+        "text": "Discuss woman mental characteristics during Dependent phase (1 s three days post-partum).",
+        "color": "",
+        "modelAnswer": "1. Mom – passive.\n2. Can’t make decisions.\n3. Activity is to tell child birth experiences.\n4. The woman’s attention is focused on her own needs for sleep, rest and she is dependent on others."
+      }
+    ]
+  }
+];
+
+
+
+/* Fallback if older export doesn't include home media */
+if(typeof QUIZ_HOME_MEDIA_START === 'undefined') var QUIZ_HOME_MEDIA_START = [];
+if(typeof QUIZ_HOME_MEDIA_END   === 'undefined') var QUIZ_HOME_MEDIA_END   = [];
+
+/* ════════════════════════════════════════════
+STATE
+════════════════════════════════════════════ */
+const LS = 'mq_' + QUIZ_TITLE.replace(/\W/g,'_');
+let S = {answers:{}, bookmarks:new Set(), written:{}, scores:{}};
+let _revFilter = 'both';
+let _curSec = null;
+let _examSt = null;
+let _examTid = null;
+let _mp = {};
+let _fc = {};
+let _sc = {};
+let _sidebarOpen = false;
+function loadState(){
+try{ const r=JSON.parse(localStorage.getItem(LS)||'{}'); S.answers=r.answers||{}; S.bookmarks=new Set(r.bookmarks||[]); S.written=r.written||{}; S.scores=r.scores||{}; }catch(e){}
+}
+function saveState(){
+try{ localStorage.setItem(LS,JSON.stringify({answers:S.answers,bookmarks:[...S.bookmarks],written:S.written,scores:S.scores})); }
+catch(e){ if(e.name==='QuotaExceededError') showToast('Storage full!'); }
+}
+/* ════════════════════════════════════════════
+HELPERS
+════════════════════════════════════════════ */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function isAr(t){ return /[\u0600-\u06FF]/.test(t); }
+function aDir(t){ return isAr(t)?'dir="rtl"':''; }
+const LTR = 'ABCDE';
+function mqMediaType(src){
+if(!src)return 'image';
+if(src.startsWith('data:video/')||/.(mp4|webm|ogg|mov)$/i.test(src))return 'video';
+if(src.startsWith('data:audio/')||/.(mp3|wav|aac|m4a|flac)$/i.test(src))return 'audio';
+if(src.startsWith('data:image/gif')||/.gif$/i.test(src))return 'gif';
+return 'image';
+}
+function mqRenderMedia(m){
+const src=m.src||'', type=m.type||mqMediaType(src);
+if(type==='video') return `<video src="${esc(src)}" controls style="max-width:100%;max-height:300px;border-radius:10px;border:1px solid var(--gray-200);margin-bottom:.5rem;display:block;"></video>`;
+if(type==='audio') return `<audio src="${esc(src)}" controls style="width:100%;border-radius:8px;margin-bottom:.5rem;display:block;"></audio>`;
+return `<img src="${esc(src)}" style="max-width:100%;max-height:300px;border-radius:10px;border:1px solid var(--gray-200);object-fit:cover;margin-bottom:.5rem;display:block;">`;
+}
+function secProg(sec){
+const qs=sec.questions.filter(q=>q.type!=='divider');
+const done=qs.filter(q=>S.answers[q.id]!==undefined).length;
+return {done,total:qs.length,pct:qs.length?Math.round(done/qs.length*100):0};
+}
+function showToast(msg, type){
+const old=document.getElementById('__toast');if(old)old.remove();
+const t=document.createElement('div');t.id='__toast';t.className='mq-toast';
+t.style.background = type==='success'?'#10b981':type==='error'?'#ef4444':'#1f2937';
+t.textContent=msg; document.body.appendChild(t);
+setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},2600);
+}
+/* ════════════════════════════════════════════
+SIDEBAR
+════════════════════════════════════════════ */
+function toggleSidebar(){
+_sidebarOpen ? closeSidebar() : openSidebar();
+}
+function openSidebar(){
+_sidebarOpen=true;
+document.getElementById('sidebar').classList.add('open');
+document.getElementById('sb-overlay').classList.add('show');
+}
+function closeSidebar(){
+_sidebarOpen=false;
+document.getElementById('sidebar').classList.remove('open');
+document.getElementById('sb-overlay').classList.remove('show');
+}
+function renderSidebar(){
+// Quiz title + logo
+const logoEl = document.getElementById('sb-logo');
+const titleEl = document.getElementById('sb-quiz-title');
+titleEl.textContent = QUIZ_TITLE;
+document.getElementById('topbar-title').textContent = _curSec ? _curSec.sec.title : QUIZ_TITLE;
+// Sections tree
+let html = '';
+QUIZ_FOLDERS.forEach((f,fi)=>{
+const col=!!_fc[fi];
+const allSi=[...f.sections,...(f.subfolders||[]).flatMap(sf=>sf.sections)];
+const tot=allSi.reduce((n,si)=>n+secProg(QUIZ_SECTIONS[si]).total,0);
+const done=allSi.reduce((n,si)=>n+secProg(QUIZ_SECTIONS[si]).done,0);
+const fIcon = f.icon ? `<i class="fas ${f.icon}" style="color:${f.color||'var(--warning)'};"></i>` : (col?'📁':'📂');
+html+=`<div class="sf-folder">
+<div class="sf-folder-hd${col?' collapsed':''}" onclick="toggleSfFold(${fi})">
+<span class="fi">${fIcon}</span>
+<span class="sf-folder-name">${esc(f.name)}</span>
+<span class="sf-folder-stat">${done}/${tot}</span>
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+</div>
+<div class="sf-children${col?' hidden':''}">`;
+f.sections.forEach(si=>{ html+=sbSecRow(si,''); });
+(f.subfolders||[]).forEach((sf,sfi)=>{
+const key=fi+'_'+sfi, c2=!!_sc[key];
+html+=`<div class="sf-subfolder-hd${c2?' collapsed':''}" onclick="toggleSfSub('${key}')">
+<span style="font-size:.82rem;">${c2?'📁':'📂'}</span>
+<span class="subfolder-name">${esc(sf.name)}</span>
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+</div>
+<div class="${c2?'sf-children hidden':'sf-children'}">`;
+sf.sections.forEach(si=>{ html+=sbSecRow(si,'ind2'); });
+html+=`</div>`;
+});
+html+=`</div></div>`;
+});
+if(QUIZ_UNGROUPED.length){
+if(QUIZ_FOLDERS.length) html+=`<div class="ungrouped-lbl">Other</div>`;
+QUIZ_UNGROUPED.forEach(si=>{ html+=sbSecRow(si,''); });
+}
+document.getElementById('sb-sections').innerHTML = html;
+}
+function sbSecRow(si, indent){
+const sec=QUIZ_SECTIONS[si], p=secProg(sec);
+const isActive = _curSec && _curSec.si===si;
+const isDone = p.pct===100;
+const secIcon = sec.icon ? `<i class="fas ${sec.icon}"></i>` : `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8m8 4H8m2-8H8"/></svg>`;
+return `<div class="sf-sec${indent?' '+indent:''}${isActive?' active-sec':''}" onclick="openSection(${si});closeSidebar();">
+<div class="sf-sec-icon">${secIcon}</div>
+<span class="sf-sec-name">${esc(sec.title)}</span>
+${isDone
+? `<div class="sf-sec-done"><span style="font-size:.5rem;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></div>`
+: (p.total>0 ? `<span class="sf-sec-pct">${p.pct}%</span>` : '')
+}
+</div>`;
+}
+function toggleSfFold(fi){ _fc[fi]=!_fc[fi]; renderSidebar(); }
+function toggleSfSub(key){ _sc[key]=!_sc[key]; renderSidebar(); }
+/* Update active nav highlight */
+function setNavActive(id){
+document.querySelectorAll('.snav-item').forEach(el=>el.classList.remove('active'));
+const el=document.getElementById('snav-'+id);
+if(el) el.classList.add('active');
+}
+/* ════════════════════════════════════════════
+SCREEN ROUTING
+════════════════════════════════════════════ */
+function showScreen(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById('sc-'+id).classList.add('active');
+updateFab();
+}
+function navTo(dest){
+if(dest==='library'){ goToLibrary(); }
+else if(dest==='exam'){ _curSec=null; showScreen('exam-setup'); renderExamSetup(); setNavActive('exam'); updateTopbar('exam'); }
+else if(dest==='review'){ _curSec=null; showScreen('review'); renderReview(); setNavActive('review'); updateTopbar('review'); }
+closeSidebar();
+}
+function updateTopbar(mode){
+const title=document.getElementById('topbar-title');
+const right=document.getElementById('topbar-right');
+if(mode==='library'){ title.textContent=QUIZ_TITLE; right.innerHTML=''; }
+else if(mode==='section' && _curSec){ title.textContent=_curSec.sec.title; right.innerHTML=`<button class="btn btn-outline btn-sm" onclick="resetCurrentSection()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/></svg> Reset</button>`; }
+else if(mode==='exam'){ title.textContent='Exam Mode'; right.innerHTML=''; }
+else if(mode==='exam-active'){ title.textContent='Exam'; right.innerHTML=''; }
+else if(mode==='results'){ title.textContent='Results'; right.innerHTML=`<button class="btn btn-outline btn-sm" onclick="navTo('exam')">New Exam</button>`; }
+else if(mode==='review'){ title.textContent='Smart Review'; right.innerHTML=''; }
+}
+/* ════════════════════════════════════════════
+LIBRARY
+════════════════════════════════════════════ */
+function goToLibrary(){
+_curSec=null;
+showScreen('library');
+renderLibrary();
+setNavActive('lib');
+updateTopbar('library');
+renderSidebar();
+}
+function renderLibrary(){
+const total=QUIZ_SECTIONS.reduce((n,s)=>n+s.questions.filter(q=>q.type!=='divider').length,0);
+let html='';
+// Hero
+html+=`<div class="lib-hero">
+<h2>${esc(QUIZ_TITLE)}</h2>
+<p>${QUIZ_SECTIONS.length} sections · ${total} questions</p>
+${QUIZ_DESCRIPTION?`<p style="margin-top:.4rem;font-size:.82rem;color:var(--gray-500);line-height:1.5;">${esc(QUIZ_DESCRIPTION)}</p>`:''}
+</div>`;
+if(QUIZ_DESCRIPTION){
+// already shown in hero
+}
+// Home screen media START
+if(QUIZ_HOME_MEDIA_START&&QUIZ_HOME_MEDIA_START.length){
+html+=`<div style="margin-bottom:1rem;">`;
+QUIZ_HOME_MEDIA_START.forEach(m=>{html+=mqRenderMedia(m);});
+html+=`</div>`;
+}
+QUIZ_FOLDERS.forEach((f,fi)=>{
+const col=!!_fc[fi];
+const allSi=[...f.sections,...(f.subfolders||[]).flatMap(sf=>sf.sections)];
+const tot=allSi.reduce((n,si)=>n+secProg(QUIZ_SECTIONS[si]).total,0);
+const done=allSi.reduce((n,si)=>n+secProg(QUIZ_SECTIONS[si]).done,0);
+html+=`<div class="folder-group">
+<div class="folder-hd${col?' collapsed':''}" onclick="toggleFoldLib(${fi})">
+<span style="color:${f.color||'var(--warning)'};font-size:.95rem;">${col?'📁':'📂'}</span>
+<span class="folder-hd-name">${esc(f.name)}</span>
+<span class="folder-hd-stat">${done}/${tot}</span>
+<button class="folder-reset-btn" onclick="event.stopPropagation();resetFolder(${fi})">↩ Reset</button>
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+</div>
+<div class="folder-children${col?' collapsed':''}">`;
+f.sections.forEach(si=>{ html+=libSecRow(si,''); });
+(f.subfolders||[]).forEach((sf,sfi)=>{
+const key=fi+'_'+sfi, c2=!!_sc[key];
+html+=`<div class="subfolder-hd${c2?' collapsed':''}" onclick="toggleSubLib('${key}')">
+<span style="color:var(--primary);font-size:.88rem;">${c2?'📁':'📂'}</span>
+<span class="subfolder-name">${esc(sf.name)}</span>
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+</div>
+<div class="folder-children${c2?' collapsed':''}">`;
+sf.sections.forEach(si=>{ html+=libSecRow(si,'ind2'); });
+html+=`</div>`;
+});
+html+=`</div></div>`;
+});
+if(QUIZ_UNGROUPED.length){
+if(QUIZ_FOLDERS.length) html+=`<div class="ungrouped-label">Other Sections</div>`;
+QUIZ_UNGROUPED.forEach(si=>{ html+=libSecRow(si,''); });
+}
+// Home screen media END
+if(QUIZ_HOME_MEDIA_END&&QUIZ_HOME_MEDIA_END.length){
+html+=`<div style="margin-top:1rem;">`;
+QUIZ_HOME_MEDIA_END.forEach(m=>{html+=mqRenderMedia(m);});
+html+=`</div>`;
+}
+document.getElementById('lib-body').innerHTML=html;
+}
+function libSecRow(si, indent){
+const sec=QUIZ_SECTIONS[si], p=secProg(sec);
+const secIcon = sec.icon
+? `<i class="fas ${sec.icon}" style="font-size:.9rem;"></i>`
+: `<span style="font-size:.85rem;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8m8 4H8m2-8H8"/></svg></span>`;
+return `<div class="sec-row${indent?' '+indent:''}" onclick="openSection(${si})">
+<div class="sec-row-icon">${secIcon}</div>
+<div class="sec-row-body">
+<div class="sec-row-name">${esc(sec.title)}</div>
+${sec.description?`<div class="sec-row-desc">${esc(sec.description)}</div>`:''}
+<div class="sec-row-prog">
+<div class="sec-row-prog-bar"><div class="sec-row-prog-fill" style="width:${p.pct}%"></div></div>
+<span class="sec-row-prog-txt">${p.done}/${p.total}</span>
+</div>
+</div>
+<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+</div>`;
+}
+function toggleFoldLib(fi){ _fc[fi]=!_fc[fi]; renderLibrary(); renderSidebar(); }
+function toggleSubLib(key){ _sc[key]=!_sc[key]; renderLibrary(); renderSidebar(); }
+async function resetFolder(fi){
+const f=QUIZ_FOLDERS[fi];
+if(!await dlgConfirm('Reset Folder',`Reset all answers in "${f.name}"?`,'Reset'))return;
+[...f.sections,...(f.subfolders||[]).flatMap(sf=>sf.sections)].forEach(si=>clearSecData(si));
+saveState(); renderLibrary(); renderSidebar();
+}
+function clearSecData(si){ QUIZ_SECTIONS[si].questions.forEach(q=>{ delete S.answers[q.id]; delete S.written[q.id]; delete S.scores[q.id]; delete _mp['mp_'+q.id]; delete _mp['mm_'+q.id]; delete _mp['ms_'+q.id]; delete _mp['mst_'+q.id]; delete _mp['msh_'+q.id]; delete _mp['op_'+q.id]; }); }
+/* ════════════════════════════════════════════
+NORMAL MODE
+════════════════════════════════════════════ */
+function openSection(si){
+_curSec={si, sec:QUIZ_SECTIONS[si]};
+_mp={};
+showScreen('normal');
+renderNormal();
+setNavActive('lib');
+updateTopbar('section');
+renderSidebar();
+}
+function getSidebarOrderedSections(){
+const seen=new Set(), ordered=[];
+QUIZ_FOLDERS.forEach(f=>{
+[...f.sections,...(f.subfolders||[]).flatMap(sf=>sf.sections)].forEach(si=>{
+if(!seen.has(si)){ seen.add(si); ordered.push(si); }
+});
+});
+QUIZ_UNGROUPED.forEach(si=>{ if(!seen.has(si)) ordered.push(si); });
+return ordered;
+}
+function renderNormal(){
+const {si,sec}=_curSec;
+const p=secProg(sec);
+document.getElementById('nm-prog-label').textContent=`${p.done} / ${p.total} answered`;
+document.getElementById('nm-prog-pct').textContent=p.pct+'%';
+document.getElementById('nm-prog-pct').style.color = p.pct===100?'var(--secondary)':'var(--primary)';
+document.getElementById('nm-progbar').style.width=p.pct+'%';
+let qn=0, html='';
+if(sec.description){
+html+=`<div class="sec-description-inline" style="background:var(--primary-light);border-left:3px solid var(--primary);border-radius:var(--radius);padding:.55rem .85rem;margin-bottom:.75rem;font-size:.9rem;color:var(--primary-dark);line-height:1.5;white-space:pre-wrap;" ${aDir(sec.description)}>${esc(sec.description)}</div>`;
+}
+// Section media START
+if(Array.isArray(sec.mediaStart)&&sec.mediaStart.length){
+html+=`<div style="margin-bottom:1rem;">`;
+sec.mediaStart.forEach(m=>{html+=mqRenderMedia(m);});
+html+=`</div>`;
+}
+// Jump-to divider chips
+const _ldivs=sec.questions.filter(q=>q.type==='divider'&&(q.dividerLabel||'').trim());
+if(_ldivs.length){
+html+=`<div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem;align-items:center;padding:.5rem .65rem;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--gray-200);">
+<span style="font-size:.65rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;">Jump to:</span>`;
+_ldivs.forEach(q=>{
+const dc=q.dividerColor||'';
+const bg=dc?dc+'18':'var(--gray-100)';
+const fg=dc||'var(--gray-500)';
+const bd=dc||'var(--gray-300)';
+html+=`<button onclick="document.getElementById('mqdiv-${q.id}')?.scrollIntoView({behavior:'smooth',block:'center'})"
+style="font-size:.72rem;font-weight:600;padding:.22rem .65rem;border-radius:999px;border:1.5px solid ${bd};background:${bg};color:${fg};cursor:pointer;white-space:nowrap;">▬ ${esc(q.dividerLabel)}</button>`;
+});
+html+=`</div>`;
+}
+sec.questions.forEach(q=>{
+if(q.type==='divider'){html+=buildDivider(q);return;}
+qn++;
+html+=buildCard(q,qn,false);
+});
+// Section media END
+if(Array.isArray(sec.mediaEnd)&&sec.mediaEnd.length){
+html+=`<div style="margin-top:1rem;">`;
+sec.mediaEnd.forEach(m=>{html+=mqRenderMedia(m);});
+html+=`</div>`;
+}
+// Section nav arrows
+const _ordSecs = getSidebarOrderedSections();
+const _curPos = _ordSecs.indexOf(si);
+const _prevSi = _curPos > 0 ? _ordSecs[_curPos-1] : null;
+const _nextSi = _curPos < _ordSecs.length-1 ? _ordSecs[_curPos+1] : null;
+if(_prevSi!==null || _nextSi!==null){
+html+=`<div class="sec-nav-arrows">
+<button class="sec-nav-btn" onclick="openSection(${_prevSi})" ${_prevSi===null?'disabled':''}><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+<span class="sec-nav-spacer"></span>
+<button class="sec-nav-btn" onclick="openSection(${_nextSi})" ${_nextSi===null?'disabled':''}><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+</div>`;
+}
+document.getElementById('nm-body').innerHTML='<div class="container">'+html+'</div>';
+}
+async function resetCurrentSection(){
+if(!await dlgConfirm('Reset Section',`Reset all answers in "${_curSec.sec.title}"?`,'Reset'))return;
+clearSecData(_curSec.si); saveState(); renderNormal(); renderSidebar();
+}
+/* ════════════════════════════════════════════
+CARD BUILDERS (identical logic to current mini-quiz)
+════════════════════════════════════════════ */
+function buildDivider(q){
+const c=q.dividerColor||'';
+const ls=c?'background:'+c+';':'';
+const bs=c?'border:1px solid '+c+';color:'+c+';':'border:1px solid var(--gray-200);color:var(--gray-500);';
+return q.dividerLabel
+?`<div id="mqdiv-${q.id}" style="display:flex;align-items:center;gap:0;margin:.75rem 0;scroll-margin-top:80px;"><div class="u-divider-line" style="${ls}"></div><div style="padding:.25rem .85rem;background:var(--gray-100);${bs}border-radius:6px;font-size:.78rem;font-weight:700;">${esc(q.dividerLabel)}</div><div class="u-divider-line" style="${ls}"></div></div>`
+:`<div style="height:2px;background:${c||'var(--gray-200)'};border-radius:1px;margin:.75rem 0;"></div>`;
+}
+function buildCard(q,qn,inExam,forceShowFeedback){
+const ans=inExam?_examSt.answers[q.id]:S.answers[q.id];
+const bkm=S.bookmarks.has(q.id);
+const bc={mcq:'badge-mcq',mcq_multi:'badge-mcq-multi',tf:'badge-tf',written:'badge-written',matching:'badge-matching',ordering:'badge-ordering'}[q.type]||'';
+const bl={mcq:'MCQ',mcq_multi:'MULTI',tf:'T/F',written:'Written',matching:'Match',ordering:'Order'}[q.type]||q.type;
+const bkmBtn=`<button class="bookmark-btn${bkm?' active':''}" id="bkm-${q.id}" onclick="toggleBkm('${q.id}')">${bkm?'🔖':'☆'}</button>`;
+const imgs=((q.images||[]).map(s=>({src:s,type:mqMediaType(s)})).concat(Array.isArray(q.media)?q.media.filter(Boolean):[])).map(m=>mqRenderMedia(m)).join('');
+const showFeedback = forceShowFeedback!==undefined ? forceShowFeedback : (!inExam || (_examSt && _examSt.instant));
+return `<div class="card" id="card-${q.id}" style="border-left-color:${q.color||'var(--gray-200)'};">
+<div class="card-header">
+<div class="flex-center"><span class="badge ${bc}">${bl}</span><span class="q-num">Q${qn}</span>${inExam?`<span class="text-muted" style="font-size:.7rem;margin-left:.25rem;">${esc(q.secTitle||'')}</span>`:''}</div>
+<div class="flex-center">${bkmBtn}</div>
+</div>
+<div class="q-text" ${aDir(q.text)}>${esc(q.text)}</div>${imgs}${buildInner(q,ans,inExam,showFeedback)}</div>`;
+}
+function buildInner(q,ans,inExam,showFeedback=true){
+switch(q.type){
+case 'mcq':     return buildMCQ(q,ans,inExam,showFeedback);
+case 'mcq_multi': return buildMulti(q,ans,inExam,showFeedback);
+case 'tf':      return buildTF(q,ans,inExam,showFeedback);
+case 'written': return buildWritten(q,inExam,showFeedback);
+case 'matching': return buildMatching(q,ans,inExam,showFeedback);
+case 'ordering': return buildOrdering(q,ans,inExam,showFeedback);
+default: return '';
+}
+}
+function buildMCQ(q,ans,inExam,showFeedback){
+const done=ans!==undefined; const fn=inExam?'selExamMCQ':'selMCQ';
+const correctIdx=parseInt(q.answer);
+let h='<div class="options-grid">';
+q.options.forEach((opt,i)=>{
+let cls='option-item';
+if(done&&showFeedback){if(i===correctIdx)cls+=' correct';else if(i===parseInt(ans))cls+=' incorrect';cls+=' disabled';}
+else if(done) cls+=' selected disabled';
+h+=`<div class="${cls}" onclick="${fn}('${q.id}',${i})"><span class="option-letter">${LTR[i]||i+1}</span><span ${aDir(opt)}>${esc(opt)}</span></div>`;
+});
+h+='</div>';
+if(done&&showFeedback){const ok=parseInt(ans)===correctIdx;h+=`<div class="feedback show ${ok?'feedback-correct':'feedback-incorrect'}"><strong>${ok?'✓ Correct!':'✗ Incorrect.'}</strong>${q.explanation?`<div class="explanation">${esc(q.explanation)}</div>`:''}</div>`;}
+else if(done&&!showFeedback) h+=`<div style="margin-top:.5rem;font-size:.78rem;color:var(--gray-500);">Answer saved — feedback shown at end.</div>`;
+return h;
+}
+function buildMulti(q,ans,inExam,showFeedback){
+const done=Array.isArray(ans); const pend=_mp['mp_'+q.id]||[];
+const fn=inExam?'togExamMulti':'togMulti'; const sfn=inExam?'subExamMulti':'subMulti';
+let h='<div class="options-grid">';
+q.options.forEach((opt,i)=>{
+let cls='option-item';
+if(done&&showFeedback){if(q.answer.includes(i)&&ans.includes(i))cls+=' correct';else if(q.answer.includes(i)&&!ans.includes(i))cls+=' option-item-missed';else if(!q.answer.includes(i)&&ans.includes(i))cls+=' incorrect';cls+=' disabled';}
+else if(done) cls+=' selected disabled';
+else if(pend.includes(i)) cls+=' selected';
+const icon=(!done&&pend.includes(i))?'✓':(LTR[i]||i+1);
+h+=`<div class="${cls}" onclick="${fn}('${q.id}',${i})"><span class="option-letter">${icon}</span><span ${aDir(opt)}>${esc(opt)}</span></div>`;
+});
+h+='</div>';
+if(!done&&pend.length) h+=`<div class="flex-center mt-2"><button class="btn btn-primary btn-sm" onclick="${sfn}('${q.id}')">✓ Submit</button><button class="btn btn-outline btn-sm" onclick="clrMulti('${q.id}')">↩</button></div>`;
+if(done&&showFeedback){const ok=JSON.stringify([...ans].sort((a,b)=>a-b))===JSON.stringify([...q.answer].sort((a,b)=>a-b));h+=`<div class="feedback show ${ok?'feedback-correct':'feedback-incorrect'}"><strong>${ok?'✓ All correct!':'✗ Not quite.'}</strong></div>`;}
+else if(done&&!showFeedback) h+=`<div style="margin-top:.5rem;font-size:.78rem;color:var(--gray-500);">Answer saved.</div>`;
+return h;
+}
+function buildTF(q,ans,inExam,showFeedback){
+const done=ans!==undefined; const fn=inExam?'selExamTF':'selTF';
+const correctAns=q.answer===true||q.answer==='true'||q.answer==='True';
+const storedAns=ans===true||ans==='true'||ans==='True';
+let h='<div class="tf-grid">';
+[true,false].forEach(v=>{
+let cls='option-item';
+const isChosen=(v===true)?storedAns:!storedAns;
+if(done&&showFeedback){if(v===correctAns)cls+=' correct';else if(v===storedAns)cls+=' incorrect';cls+=' disabled';}
+else if(done){if(isChosen)cls+=' selected';cls+=' disabled';}
+h+=`<div class="${cls}" onclick="${fn}('${q.id}',${v})" style="justify-content:center;font-weight:700;">${v?'✓ True':'✗ False'}</div>`;
+});
+h+='</div>';
+if(done&&showFeedback){const ok=storedAns===correctAns;h+=`<div class="feedback show ${ok?'feedback-correct':'feedback-incorrect'}"><strong>${ok?'✓ Correct!':'✗ Incorrect.'}</strong>${q.explanation?`<div class="explanation">${esc(q.explanation)}</div>`:''}</div>`;}
+else if(done&&!showFeedback) h+=`<div style="margin-top:.5rem;font-size:.78rem;color:var(--gray-500);">Answer saved.</div>`;
+return h;
+}
+function buildWritten(q,inExam,showFeedback){
+const saved=inExam?((_examSt&&_examSt.written)?(_examSt.written[q.id]||''):''):( S.written[q.id]||'');
+const submitted=inExam?(_examSt.answers[q.id]!==undefined):(S.answers[q.id]!==undefined);
+const sfn=inExam?'subExamWritten':'subWritten';
+const writtenStore=inExam?'_examSt.written':'S.written';
+if(submitted){
+const allModelAns=Array.isArray(q.modelAnswers)&&q.modelAnswers.length?q.modelAnswers:(q.modelAnswer?[q.modelAnswer]:(q.answer?[String(q.answer)]:[]));
+const modelAns=allModelAns[0]||'';
+const modelBlock=allModelAns.length?`<div style="margin-top:.75rem;padding:.75rem;background:var(--secondary-light);border-left:3px solid var(--secondary);border-radius:var(--radius);">
+<div style="font-size:.72rem;font-weight:700;color:#047857;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg> Model Answer${allModelAns.length>1?'s':''}</div>
+${allModelAns.map((ma,mi)=>`${allModelAns.length>1?`<div style="font-size:.68rem;font-weight:700;color:#047857;margin-bottom:.2rem;">Answer ${mi+1}</div>`:''}
+<div style="font-size:.92rem;color:var(--gray-700);line-height:1.55;white-space:pre-wrap;${allModelAns.length>1&&mi<allModelAns.length-1?'margin-bottom:.6rem;padding-bottom:.6rem;border-bottom:1px solid #a7f3d0;':''}" ${aDir(String(ma))}>${esc(String(ma))}</div>`).join('')}
+</div>`:'';
+const explBlock=q.explanation?`<div style="margin-top:.75rem;padding:.7rem .85rem;background:var(--primary-light);border-left:3px solid var(--primary);border-radius:var(--radius);">
+<div style="font-size:.72rem;font-weight:700;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm0-14v4m0 4h.01"/></svg> Explanation</div>
+<div style="font-size:.88rem;color:var(--gray-700);line-height:1.55;white-space:pre-wrap;" ${aDir(q.explanation)}>${esc(q.explanation)}</div>
+</div>`:'';
+const currentScore = inExam?(_examSt.scores&&_examSt.scores[q.id]):S.scores[q.id];
+// Self-score row: 0 / 1 / 2 / 3
+const scoreLabels=['Off track','Partial','Good','Nailed it'];
+const scoreColors=['var(--danger)','var(--warning)','var(--primary)','var(--secondary)'];
+let scoreBlock;
+if(currentScore!==undefined){
+// LOCKED — show pinned score with a small "Change" link
+scoreBlock=`<div style="margin-top:.75rem;padding:.65rem .75rem;background:var(--gray-50);border:1.5px solid ${scoreColors[currentScore]};border-radius:var(--radius);display:flex;align-items:center;gap:.6rem;">
+<span style="font-size:1.15rem;font-weight:900;color:${scoreColors[currentScore]};">${currentScore}/3</span>
+<span style="font-size:.85rem;font-weight:700;color:${scoreColors[currentScore]};flex:1;">${scoreLabels[currentScore]}</span>
+<button onclick="unsetWrittenScore('${q.id}')" style="font-size:.72rem;color:var(--gray-400);background:none;border:none;cursor:pointer;padding:.1rem .3rem;border-radius:4px;text-decoration:underline;">Change</button>
+</div>`;
+} else {
+// UNLOCKED — show rating buttons
+scoreBlock=`<div style="margin-top:.75rem;padding:.75rem;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);">
+<div style="font-size:.72rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem;">Rate your answer</div>
+<div style="display:flex;gap:.35rem;flex-wrap:wrap;">`;
+[0,1,2,3].forEach(v=>{
+scoreBlock+=`<button onclick="setWrittenScore('${q.id}',${v})"
+style="flex:1;min-width:56px;padding:.4rem .2rem;border-radius:var(--radius);border:1.5px solid var(--gray-200);
+background:var(--gray-100);color:var(--gray-500);
+font-size:.75rem;font-weight:500;cursor:pointer;transition:all .15s;line-height:1.25;text-align:center;"
+onmouseenter="this.style.borderColor='${scoreColors[v]}';this.style.color='${scoreColors[v]}'"
+onmouseleave="this.style.borderColor='var(--gray-200)';this.style.color='var(--gray-500)'"
+>${v}<br><span style="font-size:.6rem;">${scoreLabels[v]}</span></button>`;
+});
+scoreBlock+=`</div></div>`;
+}
+const compBlock=(saved&&modelAns)?`<div id="wcomp-${q.id}" style="display:none;margin-top:.75rem;padding:.75rem;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);">
+<div style="font-size:.72rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem;">Word Comparison</div>
+<div style="font-size:.88rem;line-height:1.85;">${highlightDifferences(saved,String(modelAns))}</div>
+<div style="margin-top:.4rem;font-size:.7rem;color:var(--gray-400);"><span style="background:#fecaca;padding:1px 4px;border-radius:3px;">extra</span> your words &nbsp;<span style="background:#bbf7d0;padding:1px 4px;border-radius:3px;">missing</span> from model</div>
+</div>`:'';
+return `<div class="written-answer-box">
+<div style="font-size:.72rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;">Your Answer</div>
+<div class="written-saved">${esc(saved)||'<em style="color:var(--gray-400)">Nothing written</em>'}</div>
+<div style="margin-top:.6rem;padding:.55rem .75rem;background:var(--gray-100);border-radius:var(--radius);font-size:.8rem;color:var(--gray-500);font-weight:600;display:flex;align-items:center;gap:.5rem;">
+<span>📝 Review your answer against the model below, then rate yourself.</span>
+${(saved&&modelAns)?`<button onclick="toggleWrittenComparison('${q.id}')" id="wcomp-btn-${q.id}"
+style="margin-left:auto;flex-shrink:0;font-size:.72rem;font-weight:700;padding:.2rem .55rem;border-radius:6px;border:1px solid var(--gray-300);background:var(--gray-100);cursor:pointer;color:var(--gray-600);">↕ Compare</button>`:''}
+</div>
+${compBlock}
+${modelBlock}
+${explBlock}
+${scoreBlock}
+<button class="btn btn-outline btn-sm mt-2" onclick="editWritten('${q.id}',${inExam})">✏️ Edit answer</button>
+</div>`;
+}
+return `<div class="written-answer-box"><textarea id="wt-${q.id}" rows="4" placeholder="Write your answer here…" oninput="saveWrittenInput('${q.id}',this.value,${inExam})">${esc(saved)}</textarea><div class="flex-center mt-2"><button class="btn btn-primary btn-sm" onclick="${sfn}('${q.id}')">✓ Save</button></div></div>`;
+}
+function buildMatching(q,ans,inExam,showFeedback){
+const done=ans&&typeof ans==='object'&&!Array.isArray(ans)&&Object.keys(ans).length>0;
+const allPaired=done&&Object.keys(ans).length===q.pairs.length;
+const mk='mm_'+q.id, sk='ms_'+q.id, stk='mst_'+q.id;
+if(!_mp['msh_'+q.id]) _mp['msh_'+q.id]=[...q.pairs.map((_,i)=>i)].sort(()=>Math.random()-.5);
+const umap=done?ans:(_mp[mk]||{});
+const selPIdx=_mp[sk]; const selType=_mp[stk];
+const rightOrder=allPaired?q.pairs.map((_,i)=>i):_mp['msh_'+q.id];
+const sFn=inExam?'subExamMatch':'subMatch';
+let h='';
+const _letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+if(!allPaired){
+h+=`<p class="text-muted" style="margin-bottom:.5rem;">⇄ Match each item with its pair</p><div class="matching-grid"><div>`;
+q.pairs.forEach((p,pi)=>{
+let cls='match-item';
+if(umap[pi]!==undefined)cls+=' matched';
+else if(selType==='prompt'&&selPIdx===pi)cls+=' selected';
+const matchedAnsIdx=umap[pi]!==undefined?parseInt(umap[pi]):null;
+const matchedLetter=matchedAnsIdx!==null?_letters[rightOrder.indexOf(matchedAnsIdx)]:null;
+const arrowBadge=matchedLetter?`<span style="font-size:.72rem;font-weight:700;margin-left:auto;flex-shrink:0;color:var(--secondary);">→${matchedLetter}</span>`:`<span style="font-size:.7rem;margin-left:auto;flex-shrink:0;opacity:.3;">→?</span>`;
+h+=`<div class="${cls}" onclick="matchP('${q.id}',${pi},false)" style="gap:.4rem;">`
+  +`<span style="font-size:.7rem;font-weight:700;flex-shrink:0;opacity:.7;">${pi+1}.</span>`
+  +`<span style="flex:1;">${esc(p.prompt)}</span>`
+  +arrowBadge
+  +`</div>`;
+});
+h+=`</div><div>`;
+rightOrder.forEach((oi,letterIdx)=>{
+const p=q.pairs[oi];const used=Object.values(umap).map(Number).includes(oi);
+let cls='match-item'+(used?' matched':'');
+h+=`<div class="${cls}" onclick="matchA('${q.id}',${oi},false)" style="gap:.4rem;">`
+  +`<span style="font-size:.7rem;font-weight:800;flex-shrink:0;color:var(--primary);">${_letters[letterIdx]}</span>`
+  +`<span style="flex:1;">${esc(p.answer)}</span>`
+  +`</div>`;
+});
+h+=`</div></div>`;
+}
+const mc=Object.keys(umap).length;
+if(!allPaired&&mc>0){
+h+=`<div class="flex-center mt-2"><span class="text-muted">${mc}/${q.pairs.length} matched</span>
+<button class="btn btn-primary btn-sm" onclick="${sFn}('${q.id}')">✓ Submit</button>
+<button class="btn btn-outline btn-sm" onclick="clrMatch('${q.id}')">↩</button></div>`;
+}
+if(allPaired&&showFeedback){
+const ok=q.pairs.filter((_,i)=>parseInt(umap[i])===i).length;
+const allOk=ok===q.pairs.length;
+const cmpId='mq-mcmp-'+q.id;
+// Model answer
+h+=`<div style="font-size:.68rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin:.5rem 0 .3rem;">✓ Correct Pairings</div>`;
+h+=`<div style="display:flex;flex-direction:column;gap:.25rem;">`;
+q.pairs.forEach((p,pi)=>{
+const isOk=parseInt(umap[pi])===pi;
+const bc=isOk?'var(--secondary)':'var(--danger)';
+const bg=isOk?'var(--secondary-light)':'var(--danger-light)';
+h+=`<div style="display:flex;align-items:stretch;border:1.5px solid ${bc};border-radius:7px;overflow:hidden;background:${bg};">
+<div style="flex:1;padding:.35rem .6rem;font-size:.82rem;line-height:1.35;border-right:1.5px solid ${bc};background:var(--card-bg,white);">${esc(p.prompt)}</div>
+<div style="display:flex;align-items:center;padding:0 .4rem;font-size:.75rem;color:${bc};flex-shrink:0;background:var(--card-bg,white);">→</div>
+<div style="flex:1;padding:.35rem .6rem;font-size:.82rem;line-height:1.35;">${esc(p.answer)}</div>
+<div style="display:flex;align-items:center;padding:0 .45rem;font-weight:700;font-size:.78rem;color:${isOk?'var(--secondary)':'var(--danger)'};flex-shrink:0;">${isOk?'✓':'✗'}</div>
+</div>`;
+});
+h+=`</div>`;
+h+=`<div style="display:flex;align-items:center;gap:.4rem;margin-top:.4rem;flex-wrap:wrap;">
+<div style="flex:1;padding:.35rem .6rem;border-radius:6px;background:${allOk?'var(--secondary-light)':'#fef9c3'};font-size:.78rem;font-weight:600;">${allOk?'✓ All correct!':'✗ '+ok+'/'+q.pairs.length+' correct'}</div>
+${!allOk?`<button onclick="const el=document.getElementById('${cmpId}');const open=el.style.display!=='none';el.style.display=open?'none':'block';this.textContent=open?'↕ Compare':'↕ Hide';" style="background:var(--card-bg,white);border:1px solid var(--gray-300);cursor:pointer;font-size:.68rem;font-weight:700;padding:.2rem .5rem;border-radius:5px;color:var(--gray-600);">↕ Compare</button>`:''}
+</div>`;
+// Your answer (hidden)
+if(!allOk){
+h+=`<div id="${cmpId}" style="display:none;margin-top:.4rem;">`;
+h+=`<div style="font-size:.68rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem;">👤 Your Answer</div>`;
+h+=`<div style="display:flex;flex-direction:column;gap:.25rem;">`;
+q.pairs.forEach((p,pi)=>{
+const submAnsIdx=parseInt(umap[pi]);
+const isOk=submAnsIdx===pi;
+const submAns=q.pairs[submAnsIdx]?.answer||'(not matched)';
+const bc=isOk?'var(--secondary)':'var(--danger)';
+const bg=isOk?'var(--secondary-light)':'var(--danger-light)';
+h+=`<div style="display:flex;align-items:stretch;border:1.5px solid ${bc};border-radius:7px;overflow:hidden;background:${bg};">
+<div style="flex:1;padding:.35rem .6rem;font-size:.82rem;line-height:1.35;border-right:1.5px solid ${bc};background:var(--card-bg,white);">${esc(p.prompt)}</div>
+<div style="display:flex;align-items:center;padding:0 .4rem;font-size:.75rem;color:${bc};flex-shrink:0;background:var(--card-bg,white);">→</div>
+<div style="flex:1;padding:.35rem .6rem;font-size:.82rem;line-height:1.35;">${esc(submAns)}</div>
+<div style="display:flex;align-items:center;padding:0 .45rem;font-weight:700;font-size:.78rem;color:${isOk?'var(--secondary)':'var(--danger)'};flex-shrink:0;">${isOk?'✓':'✗'}</div>
+</div>`;
+});
+h+=`</div></div>`;
+}
+}
+else if(done&&!allPaired&&!showFeedback) h+=`<div style="margin-top:.5rem;font-size:.78rem;color:var(--gray-500);">Answer saved.</div>`;
+return h;
+}
+function buildOrdering(q,ans,inExam,showFeedback){
+const done=Array.isArray(ans); const pk='op_'+q.id;
+// Seed a shuffled initial order on first render so the correct sequence isn't revealed
+if(!done && !_mp[pk] && q.items && q.items.length>1){
+  const idxs=q.items.map((_,i)=>i);
+  for(let i=idxs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idxs[i],idxs[j]]=[idxs[j],idxs[i]];}
+  _mp[pk]=idxs;
+}
+const order=done?ans:(_mp[pk]||q.items.map((_,i)=>i));
+const sFn=inExam?'subExamOrder':'subOrder';
+const correctOrder=q.answer||q.items.map((_,i)=>i);
+if(done&&showFeedback){
+// Show user's order with colour-coded feedback, then correct order below if wrong
+const allOk=JSON.stringify(ans)===JSON.stringify(correctOrder);
+let h=`<p class="text-muted" style="margin-bottom:.5rem;">Your order:</p><div class="ordering-list">`;
+ans.forEach((oi,pos)=>{
+const isOk=correctOrder[pos]===oi;
+h+=`<div class="ordering-item${isOk?' ordering-correct':' ordering-wrong'}">
+<span class="ordering-pos-badge">${pos+1}</span>
+<span style="flex:1;" ${aDir(q.items[oi])}>${esc(q.items[oi])}</span>
+<span style="font-size:.75rem;flex-shrink:0;">${isOk?'✓':'✗'}</span>
+</div>`;
+});
+h+=`</div>`;
+if(!allOk){
+h+=`<p class="text-muted" style="margin:.65rem 0 .4rem;font-size:.8rem;font-weight:700;">Correct order:</p><div class="ordering-list">`;
+correctOrder.forEach((oi,pos)=>{
+h+=`<div class="ordering-item ordering-correct" style="opacity:.9;">
+<span class="ordering-pos-badge">${pos+1}</span>
+<span style="flex:1;" ${aDir(q.items[oi])}>${esc(q.items[oi])}</span>
+</div>`;
+});
+h+=`</div>`;
+}
+h+=`<div class="feedback show ${allOk?'feedback-correct':'feedback-incorrect'} mt-2"><strong>${allOk?'✓ Perfect order!':'✗ Not quite — see correct order above.'}</strong></div>`;
+return h;
+}
+let h=`<p class="text-muted" style="margin-bottom:.5rem;">☰ Drag or use ↑↓ to reorder</p><div class="ordering-list" id="ol-${q.id}">`;
+order.forEach((oi,pos)=>{
+h+=`<div class="ordering-item" data-dm-role="ordering-item" data-dm-list="ol-${q.id}" data-dm-pos="${pos}" data-orig="${oi}">
+<svg class="ico ordering-handle" viewBox="0 0 24 24" fill="currentColor" style="cursor:grab;touch-action:none;color:var(--gray-400);font-size:.85rem;flex-shrink:0;"><circle cx="9" cy="4" r="1.2"/><circle cx="15" cy="4" r="1.2"/><circle cx="9" cy="9" r="1.2"/><circle cx="15" cy="9" r="1.2"/><circle cx="9" cy="14" r="1.2"/><circle cx="15" cy="14" r="1.2"/><circle cx="9" cy="19" r="1.2"/><circle cx="15" cy="19" r="1.2"/></svg>
+<span class="ordering-pos-badge">${pos+1}</span>
+<span style="flex:1;" ${aDir(q.items[oi])}>${esc(q.items[oi])}</span>
+<div style="display:flex;flex-direction:column;gap:1px;flex-shrink:0;">
+<button class="btn-icon" style="padding:0 .2rem;font-size:.7rem;line-height:1.2;" ${pos===0?'disabled':''} onclick="event.stopPropagation();moveOrderItem('${q.id}',${pos},-1)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg></button>
+<button class="btn-icon" style="padding:0 .2rem;font-size:.7rem;line-height:1.2;" ${pos===order.length-1?'disabled':''} onclick="event.stopPropagation();moveOrderItem('${q.id}',${pos},1)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+</div>
+</div>`;
+});
+h+=`</div>`;
+if(!done) h+=`<div class="flex-center mt-2"><button class="btn btn-primary btn-sm" onclick="${sFn}('${q.id}')">✓ Submit</button><button class="btn btn-outline btn-sm" onclick="clrOrder('${q.id}')">↩</button></div>`;
+else h+=`<div style="margin-top:.5rem;font-size:.78rem;color:var(--gray-500);">Answer saved.</div>`;
+return h;
+}
+/* ════════════════════════════════════════════
+ANSWER HANDLERS
+════════════════════════════════════════════ */
+function reRender(){
+const id=document.querySelector('.screen.active')?.id;
+if(id==='sc-normal'){ renderNormal(); renderSidebar(); checkComplete(); }
+else if(id==='sc-exam') renderExamBody();
+else if(id==='sc-review') renderReview();
+}
+function selMCQ(id,i){ if(S.answers[id]!==undefined)return; S.answers[id]=i; saveState(); reRender(); }
+function selTF(id,v){ if(S.answers[id]!==undefined)return; S.answers[id]=v; saveState(); reRender(); }
+function togMulti(id,i){ if(S.answers[id]!==undefined)return; const s=_mp['mp_'+id]||[]; const p=s.indexOf(i); if(p===-1)s.push(i);else s.splice(p,1); _mp['mp_'+id]=s; reRender(); }
+function subMulti(id){ const s=_mp['mp_'+id]||[]; if(!s.length)return; S.answers[id]=[...s].sort((a,b)=>a-b); saveState(); reRender(); }
+function clrMulti(id){ delete _mp['mp_'+id]; reRender(); }
+function subWritten(id){ if(!(S.written[id]||'').trim())return; S.answers[id]='done'; saveState(); reRender(); }
+function setWrittenScore(id, score){
+const inExam=_examSt&&(_examSt._inProgress||document.querySelector('.screen.active')?.id==='sc-results');
+if(inExam&&_examSt&&_examSt.scores) _examSt.scores[id]=score;
+else{ S.scores[id]=score; saveState(); }
+const active=document.querySelector('.screen.active')?.id;
+if(active==='sc-results') renderResults();
+else reRender();
+}
+function unsetWrittenScore(id){
+const inExam=_examSt&&(_examSt._inProgress||document.querySelector('.screen.active')?.id==='sc-results');
+if(inExam&&_examSt&&_examSt.scores) delete _examSt.scores[id];
+else{ delete S.scores[id]; saveState(); }
+const active=document.querySelector('.screen.active')?.id;
+if(active==='sc-results') renderResults();
+else reRender();
+}
+function editWritten(id,inExam){ if(inExam){ delete _examSt.answers[id]; if(_examSt.written) delete _examSt.written[id]; } else{delete S.answers[id];saveState();} reRender(); }
+function matchP(id,pi,done){ if(done)return; const sk='ms_'+id,stk='mst_'+id; if(_mp[stk]==='answer'){ const ai=_mp[sk]; const mk='mm_'+id; _mp[mk]=_mp[mk]||{}; _mp[mk][pi]=ai; delete _mp[sk];delete _mp[stk]; }else{ _mp[sk]=pi;_mp[stk]='prompt'; } reRender(); }
+function matchA(id,ai,done){ if(done)return; const sk='ms_'+id,stk='mst_'+id; if(_mp[stk]==='prompt'){ const pi=_mp[sk]; const mk='mm_'+id; _mp[mk]=_mp[mk]||{}; _mp[mk][pi]=ai; delete _mp[sk];delete _mp[stk]; }else{ _mp[sk]=ai;_mp[stk]='answer'; } reRender(); }
+function subMatch(id){ const q=QUIZ_SECTIONS.flatMap(s=>s.questions).find(q=>q.id===id); if(!q)return; S.answers[id]={...(_mp['mm_'+id]||{})}; saveState(); reRender(); }
+function clrMatch(id){ delete _mp['mm_'+id];delete _mp['ms_'+id];delete _mp['mst_'+id];delete _mp['msh_'+id]; reRender(); }
+function moveOrderItem(id,pos,dir){
+const q=QUIZ_SECTIONS.flatMap(s=>s.questions).find(q=>q.id===id); if(!q)return;
+const pk='op_'+id;
+const arr=[...(_mp[pk]||q.items.map((_,i)=>i))];
+const np=pos+dir; if(np<0||np>=arr.length)return;
+[arr[pos],arr[np]]=[arr[np],arr[pos]];
+_mp[pk]=arr; reRender();
+}
+function subOrder(id){ const q=QUIZ_SECTIONS.flatMap(s=>s.questions).find(q=>q.id===id); if(!q)return; S.answers[id]=[...(_mp['op_'+id]||q.items.map((_,i)=>i))]; saveState(); reRender(); }
+function clrOrder(id){ delete _mp['op_'+id]; reRender(); }
+function toggleBkm(id){ S.bookmarks.has(id)?S.bookmarks.delete(id):S.bookmarks.add(id); saveState(); const btn=document.getElementById("bkm-"+id); if(btn){ const on=S.bookmarks.has(id); btn.textContent=on?"🔖":"☆"; btn.classList.toggle("active",on); } else reRender(); }
+const _completed=new Set();
+function checkComplete(){
+if(!_curSec)return;
+const si=_curSec.si;
+if(_completed.has(si))return;
+const p=secProg(_curSec.sec);
+if(p.total>0&&p.done>=p.total){ _completed.add(si); setTimeout(confetti,300); showToast('🎉 Section complete!','success'); }
+}
+/* ════════════════════════════════════════════
+EXAM MODE
+════════════════════════════════════════════ */
+function renderExamSetup(){
+const sections=QUIZ_SECTIONS;
+let h='';
+sections.forEach((s,i)=>{
+const qc=s.questions.filter(q=>q.type!=='divider').length;
+h+=`<label class="checkbox-row"><input type="checkbox" value="${i}" checked class="es-cb"><span class="checkbox-row-label">${esc(s.title)}</span><span class="checkbox-row-count">${qc} q</span></label>`;
+});
+document.getElementById('es-sections').innerHTML=h;
+}
+function startExam(){
+const selected=[...document.querySelectorAll('.es-cb:checked')].map(c=>parseInt(c.value));
+if(!selected.length){showToast('Select at least one section.');return;}
+const shuffle=document.getElementById('opt-shuffle').checked;
+const instant=document.querySelector('input[name=fbmode]:checked')?.value==='instant';
+const timerMin=parseInt(document.getElementById('opt-timer').value)||0;
+let qs=[];
+selected.forEach(si=>{
+const sec=QUIZ_SECTIONS[si];
+sec.questions.filter(q=>q.type!=='divider').forEach(q=>{ qs.push({...q,secTitle:sec.title,globalId:q.id}); });
+});
+if(shuffle) qs=qs.sort(()=>Math.random()-.5);
+_examSt={qs,answers:{},instant,_inProgress:true,written:{},scores:{},_revFilter:'all'};
+// Clear matching/ordering in-progress state for exam questions so normal-mode state doesn't bleed in
+qs.forEach(q=>{
+delete _mp['mp_'+q.id]; delete _mp['mm_'+q.id]; delete _mp['ms_'+q.id];
+delete _mp['mst_'+q.id]; delete _mp['msh_'+q.id]; delete _mp['op_'+q.id];
+});
+if(timerMin>0){ let secs=timerMin*60; _examTid=setInterval(()=>{ secs--; const el=document.getElementById('exam-timer'); if(el){el.textContent=`⏱ ${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`; el.style.display='inline-flex'; if(secs<=60)el.classList.add('urgent'); } if(secs<=0){clearInterval(_examTid);finishExam();} },1000); }
+showScreen('exam'); renderExamBody(); updateTopbar('exam-active');
+}
+function renderExamBody(){
+if(!_examSt)return;
+const ans=_examSt.answers; const qs=_examSt.qs;
+const ac=qs.filter(q=>ans[q.id]!==undefined).length;
+const pct=qs.length?Math.round(ac/qs.length*100):0;
+document.getElementById('exam-ans-lbl').textContent=`${ac} / ${qs.length}`;
+document.getElementById('exam-pct-lbl').textContent=pct+'%';
+document.getElementById('exam-prog-fill').style.width=pct+'%';
+let html='<div class="container">', qn=0, lastSec='';
+qs.forEach(q=>{
+if(q.secTitle!==lastSec){html+=`<div class="section-divider-lbl">${esc(q.secTitle)}</div>`;lastSec=q.secTitle;}
+qn++; html+=buildCard(q,qn,true);
+});
+html+=`<div class="flex-center mt-4" style="justify-content:center;"><button class="btn btn-exam" onclick="finishExam()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg> Finish Exam</button></div></div>`;
+document.getElementById('exam-body').innerHTML=html;
+}
+async function confirmExitExam(){
+if(await dlgConfirm('Exit Exam?','Your answers will be lost.','Exit')) exitExam();
+}
+function exitExam(){ clearInterval(_examTid); _examTid=null; _examSt=null; navTo('library'); }
+async function finishExam(){
+if(!_examSt)return;
+clearInterval(_examTid); _examTid=null;
+_examSt.qs.forEach(q=>{ if(_examSt.answers[q.id]!==undefined) S.answers[q.id]=_examSt.answers[q.id]; });
+_examSt._inProgress=false;
+saveState();
+// Compute score once and cache on _examSt
+let correct=0,total=0,skipped=0;
+_examSt.qs.forEach(q=>{
+if(q.type==='written'){return;}
+total++;
+const ua=_examSt.answers[q.id];
+if(ua===undefined){skipped++;return;}
+if(q.type==='mcq'&&parseInt(ua)===parseInt(q.answer)) correct++;
+else if(q.type==='tf'&&(ua===true||ua==='true'||ua==='True')===(q.answer===true||q.answer==='true'||q.answer==='True')) correct++;
+else if(q.type==='mcq_multi'&&JSON.stringify([...ua].sort((a,b)=>a-b))===JSON.stringify([...q.answer].sort((a,b)=>a-b))) correct++;
+else if(q.type==='ordering'&&JSON.stringify(ua)===JSON.stringify(q.answer||q.items.map((_,i)=>i))) correct++;
+else if(q.type==='matching'&&q.pairs.every((_,i)=>parseInt(ua[i])===i)) correct++;
+});
+_examSt._score={correct,total,skipped};
+showScreen('results'); updateTopbar('results'); renderSidebar();
+renderResults();
+}
+function renderResults(){
+if(!_examSt||!_examSt._score)return;
+const {correct,total,skipped}=_examSt._score;
+const scoreColors=['var(--danger)','var(--warning)','var(--primary)','var(--secondary)'];
+const scoreLabels=['Off track','Partial','Good','Nailed it'];
+// Update hero score
+document.getElementById('res-score').textContent=`${correct} / ${total}`;
+document.getElementById('res-chips').innerHTML=
+`<div class="chip chip-correct">✓ ${correct} correct</div>` +
+`<div class="chip chip-wrong">✗ ${total-correct-skipped} wrong</div>` +
+(skipped?`<div class="chip chip-skip">— ${skipped} skipped</div>`:'');
+let body='<div class="container">';
+// ── WRITTEN SELF-REVIEW PANEL (delayed mode only) ──────────────────
+const writtenQs=_examSt.qs.filter(q=>q.type==='written'&&_examSt.answers[q.id]!==undefined);
+if(writtenQs.length&&!_examSt.instant){
+const _sc=_examSt.scores||{};
+const rated=writtenQs.filter(q=>_sc[q.id]!==undefined).length;
+const allDone=rated===writtenQs.length;
+const writtenTotal=writtenQs.length*3;
+const writtenEarned=writtenQs.reduce((s,q)=>s+(_sc[q.id]||0),0);
+body+=`<div style="background:var(--card-bg,white);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--gray-200);overflow:hidden;margin-bottom:1.25rem;">
+<div style="padding:.85rem 1.1rem;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:.6rem;background:var(--gray-50);">
+<span style="font-size:1.1rem;">✏️</span>
+<div style="flex:1;">
+<div style="font-weight:700;font-size:.92rem;color:var(--gray-800);">Written Answers — Self Review</div>
+<div style="font-size:.72rem;color:var(--gray-500);margin-top:.1rem;">${writtenQs.length} question${writtenQs.length!==1?'s':''} · Read each answer, compare to the model, then rate yourself</div>
+</div>
+${allDone
+? `<div style="text-align:right;flex-shrink:0;"><div style="font-size:1.2rem;font-weight:900;color:var(--secondary);">${writtenEarned}/${writtenTotal}</div><div style="font-size:.62rem;color:var(--gray-400);font-weight:600;">TOTAL</div></div>`
+: `<div style="font-size:.68rem;font-weight:700;background:var(--warning-light);color:#92400e;padding:2px 8px;border-radius:999px;flex-shrink:0;">${rated}/${writtenQs.length} rated</div>`
+}
+</div>`;
+writtenQs.forEach((q,i)=>{
+const _wr=_examSt.written||{};
+const saved=_wr[q.id]||'';
+const allMA=Array.isArray(q.modelAnswers)&&q.modelAnswers.length?q.modelAnswers:(q.modelAnswer?[q.modelAnswer]:[]);
+const firstMA=allMA[0]||'';
+const cs=_sc[q.id];
+const isLast=i===writtenQs.length-1;
+// Model answer block — green, shows all answers
+const maBlock=allMA.length?`<div style="padding:.6rem .7rem;background:var(--secondary-light);border:1px solid var(--secondary);border-radius:var(--radius);">
+<div style="font-size:.62rem;font-weight:700;color:#047857;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg> Model Answer${allMA.length>1?'s':''}</div>
+${allMA.map((ma,mi)=>`${allMA.length>1?`<div style="font-size:.62rem;font-weight:700;color:#047857;margin-bottom:.1rem;">Answer ${mi+1}</div>`:''}<div style="font-size:.86rem;line-height:1.5;white-space:pre-wrap;color:var(--gray-700);${allMA.length>1&&mi<allMA.length-1?'margin-bottom:.5rem;padding-bottom:.5rem;border-bottom:1px solid #a7f3d0;':''}" ${aDir(String(ma))}>${esc(String(ma))}</div>`).join('')}
+</div>`:`<div style="padding:.6rem .7rem;background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:.8rem;">No model answer</div>`;
+// Compare block
+const compBlock=(saved&&firstMA)?`<div id="rcomp-${q.id}" style="display:none;margin:.5rem 0;padding:.7rem;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);">
+<div style="font-size:.68rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem;">Word Comparison</div>
+<div style="font-size:.85rem;line-height:1.85;">${highlightDifferences(saved,String(firstMA))}</div>
+<div style="margin-top:.35rem;font-size:.68rem;color:var(--gray-400);"><span style="background:#fecaca;padding:1px 4px;border-radius:3px;">extra</span> your words &nbsp;<span style="background:#bbf7d0;padding:1px 4px;border-radius:3px;">missing</span> from model</div>
+</div>`:'';
+// Explanation block
+const explBlock=q.explanation?`<div style="margin:.5rem 0;padding:.6rem .75rem;background:var(--primary-light);border-left:3px solid var(--primary);border-radius:var(--radius);">
+<div style="font-size:.62rem;font-weight:700;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm0-14v4m0 4h.01"/></svg> Explanation</div>
+<div style="font-size:.84rem;color:var(--gray-700);line-height:1.5;white-space:pre-wrap;" ${aDir(q.explanation)}>${esc(q.explanation)}</div>
+</div>`:'';
+body+=`<div style="padding:.9rem 1.1rem;${!isLast?'border-bottom:1px solid var(--gray-100);':''}">
+<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;">
+<div style="width:22px;height:22px;border-radius:50%;background:${cs!==undefined?scoreColors[cs]:'var(--gray-200)'};color:${cs!==undefined?'white':'var(--gray-500)'};display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;">${cs!==undefined?cs:'?'}</div>
+<span style="font-size:.72rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;">Question ${i+1}${q.secTitle?` · ${esc(q.secTitle)}`:''}</span>
+${(saved&&firstMA)?`<button onclick="toggleRComp('${q.id}')" id="rcomp-btn-${q.id}"
+style="margin-left:auto;font-size:.68rem;font-weight:700;padding:.18rem .5rem;border-radius:6px;border:1px solid var(--gray-300);background:var(--gray-100);cursor:pointer;color:var(--gray-600);">↕ Compare</button>`:''}
+</div>
+<div style="font-size:.93rem;line-height:1.55;margin-bottom:.6rem;color:var(--gray-800);" ${aDir(q.text)}>${esc(q.text)}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem;">
+<div style="padding:.6rem .7rem;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);">
+<div style="font-size:.62rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem;">Your answer</div>
+<div style="font-size:.86rem;line-height:1.5;white-space:pre-wrap;color:var(--gray-700);" ${aDir(saved)}>${esc(saved)||'<em style="color:var(--gray-400);">—</em>'}</div>
+</div>
+${maBlock}
+</div>
+${compBlock}
+${explBlock}
+${cs!==undefined
+? `<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem .65rem;background:var(--gray-50);border:1.5px solid ${scoreColors[cs]};border-radius:var(--radius);">
+<span style="font-size:1.05rem;font-weight:900;color:${scoreColors[cs]};">${cs}/3</span>
+<span style="font-size:.83rem;font-weight:700;color:${scoreColors[cs]};flex:1;">${scoreLabels[cs]}</span>
+<button onclick="unsetWrittenScore('${q.id}')" style="font-size:.7rem;color:var(--gray-400);background:none;border:none;cursor:pointer;text-decoration:underline;padding:.1rem .3rem;">Change</button>
+</div>`
+: `<div style="display:flex;gap:.3rem;">
+${[0,1,2,3].map(v=>`<button onclick="setWrittenScore('${q.id}',${v})"
+style="flex:1;padding:.45rem .2rem;border-radius:var(--radius);border:1.5px solid var(--gray-200);background:var(--card-bg,white);
+color:var(--gray-500);font-size:.75rem;font-weight:500;cursor:pointer;line-height:1.25;text-align:center;transition:all .15s;"
+onmouseenter="this.style.borderColor='${scoreColors[v]}';this.style.color='${scoreColors[v]}';this.style.background='${scoreColors[v]}18'"
+onmouseleave="this.style.borderColor='var(--gray-200)';this.style.color='var(--gray-500)';this.style.background='var(--card-bg,white)'"
+>${v}<br><span style="font-size:.6rem;opacity:.8;">${scoreLabels[v]}</span></button>`).join('')}
+</div>`
+}
+</div>`;
+});
+body+=`</div>`;
+}
+// ── QUESTION REVIEW — filterable ──────────────────────────────────
+if(!_examSt._revFilter) _examSt._revFilter='all';
+const _qs=_examSt.qs;
+// Build filter counts
+const _fc={all:_qs.length,mistakes:0,skipped:0};
+const _ts=new Set();
+_qs.forEach(q=>{
+if(q.type==='written'){_ts.add('written');return;}
+_ts.add(q.type);
+const ua=_examSt.answers[q.id];
+if(ua===undefined){_fc.skipped++;return;}
+let ok=false;
+if(q.type==='mcq') ok=parseInt(ua)===parseInt(q.answer);
+else if(q.type==='tf') ok=(ua===true||ua==='true'||ua==='True')===(q.answer===true||q.answer==='true'||q.answer==='True');
+else if(q.type==='mcq_multi') ok=JSON.stringify([...ua].sort((a,b)=>a-b))===JSON.stringify([...q.answer].sort((a,b)=>a-b));
+else if(q.type==='ordering') ok=JSON.stringify(ua)===JSON.stringify(q.answer||q.items.map((_,i)=>i));
+else if(q.type==='matching') ok=q.pairs.every((_,pi)=>parseInt(ua[pi])===pi);
+if(!ok) _fc.mistakes++;
+});
+const _fBtn=(key,lbl,cnt,col)=>cnt>0?`<button onclick="_examSt._revFilter='${key}';renderResults();"
+style="font-size:.72rem;font-weight:600;padding:.28rem .65rem;border-radius:999px;
+border:1.5px solid ${_examSt._revFilter===key?col:'var(--gray-200)'};
+background:${_examSt._revFilter===key?col:'var(--gray-100)'};
+color:${_examSt._revFilter===key?'white':'var(--gray-500)'};
+cursor:pointer;transition:all .15s;">${lbl} (${cnt})</button>`:'';
+body+=`<div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem;align-items:center;">
+<button onclick="_examSt._revFilter='all';renderResults();"
+style="font-size:.72rem;font-weight:600;padding:.28rem .65rem;border-radius:999px;
+border:1.5px solid ${_examSt._revFilter==='all'?'var(--primary)':'var(--gray-200)'};
+background:${_examSt._revFilter==='all'?'var(--primary)':'var(--gray-100)'};
+color:${_examSt._revFilter==='all'?'white':'var(--gray-500)'};cursor:pointer;">All (${_fc.all})</button>
+${_fBtn('mistakes','✗ Mistakes',_fc.mistakes,'var(--danger)')}
+${_fBtn('skipped','— Skipped',_fc.skipped,'#0891b2')}
+${_ts.has('mcq')||_ts.has('mcq_multi')?_fBtn('mcq','MCQ',_qs.filter(q=>q.type==='mcq'||q.type==='mcq_multi').length,'var(--primary)'):''}
+${_ts.has('tf')?_fBtn('tf','T/F',_qs.filter(q=>q.type==='tf').length,'var(--warning)'):''}
+${_ts.has('written')?_fBtn('written','Written',_qs.filter(q=>q.type==='written').length,'var(--written)'):''}
+${_ts.has('matching')?_fBtn('matching','Match',_qs.filter(q=>q.type==='matching').length,'#7e22ce'):''}
+${_ts.has('ordering')?_fBtn('ordering','Order',_qs.filter(q=>q.type==='ordering').length,'#ea580c'):''}
+</div>`;
+// Filtered question list
+let qn=0, anyShown=false;
+_qs.forEach(q=>{
+if(q.type!=='divider') qn++;
+const ua=_examSt.answers[q.id];
+const skipped=ua===undefined;
+let ok=false;
+if(!skipped&&q.type!=='written'){
+if(q.type==='mcq') ok=parseInt(ua)===parseInt(q.answer);
+else if(q.type==='tf') ok=(ua===true||ua==='true'||ua==='True')===(q.answer===true||q.answer==='true'||q.answer==='True');
+else if(q.type==='mcq_multi') ok=JSON.stringify([...ua].sort((a,b)=>a-b))===JSON.stringify([...q.answer].sort((a,b)=>a-b));
+else if(q.type==='ordering') ok=JSON.stringify(ua)===JSON.stringify(q.answer||q.items.map((_,i)=>i));
+else if(q.type==='matching') ok=q.pairs.every((_,pi)=>parseInt(ua[pi])===pi);
+}
+const f=_examSt._revFilter;
+if(f==='mistakes' && (skipped||ok||q.type==='written')) return;
+if(f==='skipped'  && !skipped) return;
+if(f==='mcq'      && q.type!=='mcq'&&q.type!=='mcq_multi') return;
+if(f==='tf'       && q.type!=='tf') return;
+if(f==='written'  && q.type!=='written') return;
+if(f==='matching' && q.type!=='matching') return;
+if(f==='ordering' && q.type!=='ordering') return;
+anyShown=true;
+body+=buildCard(q,qn,true,true);
+});
+if(!anyShown) body+=`<div style="text-align:center;padding:2rem;color:var(--gray-400);font-size:.88rem;">No questions match this filter.</div>`;
+body+='</div>';
+document.getElementById('res-body').innerHTML=body;
+}
+function selExamMCQ(id,i){ if(!_examSt||_examSt.answers[id]!==undefined)return; _examSt.answers[id]=i; reRender(); }
+function selExamTF(id,v){ if(!_examSt||_examSt.answers[id]!==undefined)return; _examSt.answers[id]=v; reRender(); }
+function togExamMulti(id,i){ if(!_examSt||_examSt.answers[id]!==undefined)return; const s=_mp['mp_'+id]||[]; const p=s.indexOf(i); if(p===-1)s.push(i);else s.splice(p,1); _mp['mp_'+id]=s; reRender(); }
+function subExamMulti(id){ const s=_mp['mp_'+id]||[]; if(!s.length)return; _examSt.answers[id]=[...s].sort((a,b)=>a-b); reRender(); }
+function saveWrittenInput(id,val,inExam){
+if(inExam){ if(_examSt&&_examSt.written) _examSt.written[id]=val; }
+else{ S.written[id]=val; saveState(); }
+}
+function subExamWritten(id){ if(!(_examSt&&_examSt.written&&(_examSt.written[id]||'').trim()))return; _examSt.answers[id]='done'; reRender(); }
+function subExamMatch(id){ const q=QUIZ_SECTIONS.flatMap(s=>s.questions).find(q=>q.id===id); if(!q)return; _examSt.answers[id]={...(_mp['mm_'+id]||{})}; reRender(); }
+function subExamOrder(id){ const q=QUIZ_SECTIONS.flatMap(s=>s.questions).find(q=>q.id===id); if(!q)return; _examSt.answers[id]=[...(_mp['op_'+id]||q.items.map((_,i)=>i))]; reRender(); }
+/* ════════════════════════════════════════════
+SMART REVIEW
+════════════════════════════════════════════ */
+function setRevFilter(f){
+_revFilter=f;
+document.querySelectorAll('.review-tab').forEach(t=>t.classList.remove('active'));
+document.getElementById('rt-'+f.replace('incorrect','inc').replace('bookmarks','bkm')).classList.add('active');
+renderReview();
+}
+function renderReview(){
+const allQs=QUIZ_SECTIONS.flatMap((s,si)=>s.questions.filter(q=>q.type!=='divider').map(q=>({...q,secTitle:s.title})));
+const mids=new Set(allQs.filter(q=>{ const ua=S.answers[q.id]; if(ua===undefined)return false; if(q.type==='mcq')return parseInt(ua)!==parseInt(q.answer); if(q.type==='tf')return(ua===true||ua==='true'||ua==='True')!==(q.answer===true||q.answer==='true'||q.answer==='True'); if(q.type==='mcq_multi')return JSON.stringify([...ua].sort((a,b)=>a-b))!==JSON.stringify([...q.answer].sort((a,b)=>a-b)); return false; }).map(q=>q.id));
+const bkmIds=S.bookmarks;
+let items=allQs.filter(q=>{ if(_revFilter==='incorrect')return mids.has(q.id); if(_revFilter==='bookmarks')return bkmIds.has(q.id); return mids.has(q.id)||bkmIds.has(q.id); });
+const count=items.length;
+document.getElementById('snav-review-badge').textContent=count||'';
+document.getElementById('snav-review-badge').style.display=count?'':'none';
+const body=document.getElementById('rev-body');
+if(!count){body.innerHTML=`<div style="text-align:center;padding:3rem 1rem;color:var(--gray-400);">✅<h3 style="color:var(--gray-600);margin-top:.5rem;">All clear!</h3><p>No mistakes or bookmarks yet.</p></div>`;return;}
+let h='<div class="container">';
+items.forEach(q=>{
+const isMist=mids.has(q.id),isBkm=bkmIds.has(q.id);
+const bc={mcq:'badge-mcq',mcq_multi:'badge-mcq-multi',tf:'badge-tf',written:'badge-written',matching:'badge-matching',ordering:'badge-ordering'}[q.type]||'';
+let labelHtml='';
+if(isMist) labelHtml+=`<span style="font-size:.68rem;font-weight:700;padding:.2rem .55rem;border-radius:999px;background:var(--danger-light);color:var(--danger);">✗ Mistake</span>`;
+if(isBkm) labelHtml+=`<span style="font-size:.68rem;font-weight:700;padding:.2rem .55rem;border-radius:999px;background:var(--warning-light);color:#92400e;">🔖 Saved</span>`;
+const borderColor=isMist?'var(--danger)':isBkm?'var(--warning)':'var(--gray-200)';
+h+=`<div class="card" style="border-left-color:${borderColor};">
+<div class="card-header">
+<div class="flex-center" style="gap:.3rem;flex-wrap:wrap;">${labelHtml}<span class="badge ${bc}">${q.type.toUpperCase()}</span></div>
+<button class="bookmark-btn${isBkm?' active':''}" onclick="toggleBkm('${q.id}')">${isBkm?'🔖':'☆'}</button>
+</div>
+<div class="q-text" ${aDir(q.text)}>${esc(q.text)}</div>
+<div class="text-muted" style="margin-bottom:.55rem;font-size:.75rem;">📁 ${esc(q.secTitle)}</div>
+${buildInner(q,S.answers[q.id],false)}
+</div>`;
+});
+h+='</div>'; body.innerHTML=h;
+}
+/* ════════════════════════════════════════════
+DIALOG
+════════════════════════════════════════════ */
+let _dr=null;
+function dlgConfirm(title,msg,okLabel='Confirm',okCls='btn-danger'){
+return new Promise(res=>{
+_dr=res;
+document.getElementById('dlg-title').textContent=title;
+document.getElementById('dlg-msg').textContent=msg;
+const ok=document.getElementById('dlg-yes');
+ok.textContent=okLabel; ok.className='btn '+okCls;
+document.getElementById('dlg').classList.remove('hidden');
+});
+}
+function _dlgYes(){ document.getElementById('dlg').classList.add('hidden'); _dr&&_dr(true); }
+function _dlgNo(){ document.getElementById('dlg').classList.add('hidden'); _dr&&_dr(false); }
+document.addEventListener('keydown',e=>{
+if(e.key==='Escape'){
+if(!document.getElementById('dlg').classList.contains('hidden')){ _dlgNo(); return; }
+if(_sidebarOpen){ closeSidebar(); return; }
+if(document.getElementById('sc-normal').classList.contains('active')){ goToLibrary(); return; }
+}
+});
+/* ════════════════════════════════════════════
+SCROLL FAB
+════════════════════════════════════════════ */
+function getActiveCA(){ return document.querySelector('.screen.active .content-area'); }
+function updateFab(){
+const ca=getActiveCA(); if(!ca) return;
+const nearTop=ca.scrollTop<120;
+const icon=document.getElementById('scrollFabIcon');
+if(icon) icon.innerHTML=nearTop?'<path d="M12 5v14m7-7-7 7-7-7"/>':'<path d="M12 19V5m-7 7 7-7 7 7"/>';
+}
+function scrollFabClick(){
+const ca=getActiveCA(); if(!ca)return;
+const nearTop=ca.scrollTop<120;
+ca.scrollTo({top:nearTop?ca.scrollHeight:0,behavior:'smooth'});
+}
+document.querySelectorAll('.content-area').forEach(ca=>ca.addEventListener('scroll',updateFab,{passive:true}));
+setTimeout(updateFab,100);
+/* ════════════════════════════════════════════
+DRAG (ordering)
+════════════════════════════════════════════ */
+(function(){
+const T=5,SZ=60,SS=10;
+let _s=null,_g=null,_oEl=null,_oP=null,_act=false,_raf=null,_cx=0,_cy=0;
+function _mk(el){const r=el.getBoundingClientRect(),g=el.cloneNode(true);g.className='dm-ghost';g.removeAttribute('data-dm-role');g.style.cssText=`width:${r.width}px;height:${r.height}px;left:${r.left}px;top:${r.top}px;`;document.body.appendChild(g);return g;}
+function _cO(){if(_oEl){_oEl.classList.remove('dm-drop-before','dm-drop-after');_oEl=null;_oP=null;}}
+function _sO(el,p){if(el===_oEl&&p===_oP)return;_cO();if(el){_oEl=el;_oP=p;el.classList.add(p==='before'?'dm-drop-before':'dm-drop-after');}}
+function _can(){cancelAnimationFrame(_raf);_raf=null;if(_g){_g.remove();_g=null;}_cO();if(_s){_s.el.classList.remove('dm-dragging');_s=null;}_act=false;}
+function _sc(){_raf=null;const el=document.querySelector('.screen.active .content-area');if(el){const r=el.getBoundingClientRect();if(_cy<r.top+SZ)el.scrollTop-=SS;else if(_cy>r.bottom-SZ)el.scrollTop+=SS;}if(_act)_raf=requestAnimationFrame(_sc);}
+function _fn(x,y){if(_g)_g.style.visibility='hidden';const h=document.elementFromPoint(x,y);if(_g)_g.style.visibility='';if(!h||!_s)return{el:null,p:null};const t=h.closest('[data-dm-role="ordering-item"]');if(!t||t===_s.el||t.dataset.dmList!==_s.el.dataset.dmList)return{el:null,p:null};const r=t.getBoundingClientRect();return{el:t,p:y<r.top+r.height/2?'before':'after'};}
+function _cm(src,dst,pos){
+const listId=src.dataset.dmList,fp=parseInt(src.dataset.dmPos),dp=parseInt(dst.dataset.dmPos);
+let ins=pos==='before'?dp:dp+1;if(fp===ins||fp+1===ins)return;
+const qId=listId.replace('ol-','');
+const q=QUIZ_SECTIONS.flatMap(s=>s.questions).find(q=>q.id===qId);if(!q)return;
+const pk='op_'+qId,arr=[...(_mp[pk]||q.items.map((_,i)=>i))];
+const[m]=arr.splice(fp,1);arr.splice(fp<ins?ins-1:ins,0,m);_mp[pk]=arr;
+reRender();
+}
+document.addEventListener('pointerdown',e=>{if(e.button&&e.pointerType==='mouse')return;const h=e.target.closest('.ordering-handle');if(!h)return;const el=h.closest('[data-dm-role="ordering-item"]');if(!el)return;_s={el,startX:e.clientX,startY:e.clientY};_act=false;},{passive:true});
+document.addEventListener('pointermove',e=>{if(!_s)return;const dx=e.clientX-_s.startX,dy=e.clientY-_s.startY;_cx=e.clientX;_cy=e.clientY;if(!_act){if(Math.hypot(dx,dy)<T)return;_act=true;_g=_mk(_s.el);_s.el.classList.add('dm-dragging');if(!_raf)_raf=requestAnimationFrame(_sc);}_g.style.transform=`translate(${dx}px,${dy}px)`;const{el,p}=_fn(e.clientX,e.clientY);_sO(el,p);},{passive:true});
+function _end(){if(!_s)return;const s=_s.el,d=_oEl,p=_oP;_can();if(d&&p)_cm(s,d,p);}
+document.addEventListener('pointerup',_end,{passive:true});
+document.addEventListener('pointercancel',_can,{passive:true});
+})();
+/* ════════════════════════════════════════════
+CONFETTI
+════════════════════════════════════════════ */
+function confetti(){
+const COLORS=['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
+let running=false; if(running)return; running=true;
+const c=document.createElement('canvas');
+c.id='mqConfettiCanvas'; document.body.appendChild(c);
+const ctx=c.getContext('2d'); c.width=window.innerWidth; c.height=window.innerHeight;
+const P=Array.from({length:100},()=>({x:Math.random()*c.width,y:-10-Math.random()*40,r:4+Math.random()*6,d:1.5+Math.random()*2.5,color:COLORS[Math.floor(Math.random()*COLORS.length)],tilt:Math.random()*10-5,tiltSpeed:.1+Math.random()*.2,angle:0,spin:(Math.random()-.5)*.15,shape:Math.random()<.5?'rect':'circle'}));
+let f=0; const MAX=130;
+function draw(){
+if(f>MAX){c.remove();running=false;return;}
+ctx.clearRect(0,0,c.width,c.height);
+P.forEach(p=>{p.angle+=p.spin;p.tilt+=Math.sin(f*p.tiltSpeed)*.4;p.y+=p.d+Math.sin(f*.05)*.3;p.x+=Math.sin(p.angle)*1.2;ctx.save();ctx.globalAlpha=Math.max(0,1-f/MAX);ctx.fillStyle=p.color;ctx.translate(p.x,p.y);ctx.rotate(p.tilt*Math.PI/180);if(p.shape==='circle'){ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();}else{ctx.fillRect(-p.r,-p.r*.5,p.r*2,p.r);}ctx.restore();});
+f++;requestAnimationFrame(draw);
+}
+draw();
+}
+/* ════════════════════════════════════════════
+WRITTEN COMPARISON
+════════════════════════════════════════════ */
+function highlightDifferences(userText,modelText){
+if(!modelText) return esc(userText);
+// hex escapes survive all quoting/escaping contexts
+const uW=userText.split(/[\x09\x0a\x0d ]+/).filter(Boolean);
+const mW=modelText.split(/[\x09\x0a\x0d ]+/).filter(Boolean);
+// Simple LCS-based diff so words aren't eaten by the naive zipper
+const dp=Array.from({length:uW.length+1},()=>new Array(mW.length+1).fill(0));
+for(let a=1;a<=uW.length;a++) for(let b=1;b<=mW.length;b++)
+dp[a][b]=uW[a-1].toLowerCase()===mW[b-1].toLowerCase()?dp[a-1][b-1]+1:Math.max(dp[a-1][b],dp[a][b-1]);
+const res=[];let a=uW.length,b=mW.length;
+const extra=[],missing=[];
+while(a>0||b>0){
+if(a>0&&b>0&&uW[a-1].toLowerCase()===mW[b-1].toLowerCase()){res.unshift({t:'eq',w:uW[a-1]});a--;b--;}
+else if(b>0&&(a===0||dp[a][b-1]>=dp[a-1][b])){res.unshift({t:'mis',w:mW[b-1]});b--;}
+else{res.unshift({t:'ext',w:uW[a-1]});a--;}
+}
+return res.map(r=>
+r.t==='eq'  ? esc(r.w) :
+r.t==='ext' ? `<span style="background:#fecaca;border-radius:3px;padding:0 2px;">${esc(r.w)}</span>` :
+`<span style="background:#bbf7d0;border-radius:3px;padding:0 2px;">${esc(r.w)}</span>`
+).join(' ');
+}
+function toggleWrittenComparison(id){
+const box=document.getElementById('wcomp-'+id);
+const btn=document.getElementById('wcomp-btn-'+id);
+if(!box)return;
+const open=box.style.display!=='none';
+box.style.display=open?'none':'block';
+if(btn)btn.textContent=open?'↕ Compare':'↕ Hide';
+}
+function toggleRComp(id){
+const box=document.getElementById('rcomp-'+id);
+const btn=document.getElementById('rcomp-btn-'+id);
+if(!box)return;
+const open=box.style.display!=='none';
+box.style.display=open?'none':'block';
+if(btn)btn.textContent=open?'↕ Compare':'↕ Hide';
+}
+function toggleNmDividerEdit(gid){
+const pill=document.querySelector('#divider-'+gid+' .nm-div-pill');
+const editRow=document.getElementById('nmdiv-edit-'+gid);
+if(!pill||!editRow)return;
+const open=editRow.style.display==='flex';
+if(open){editRow.style.display='none';pill.style.display='';}
+else{pill.style.display='none';editRow.style.display='flex';const inp=editRow.querySelector('input');if(inp){inp.focus();inp.select();}}
+}
+/* ════════════════════════════════════════════
+INIT
+════════════════════════════════════════════ */
+loadState();
+renderSidebar();
+goToLibrary();
+renderExamSetup();
+
+/* ════════════════════════════════════════════
+DARK MODE
+════════════════════════════════════════════ */
+function toggleDarkMode(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  if(isDark){document.documentElement.removeAttribute('data-theme');localStorage.setItem('mq_theme','light');}
+  else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('mq_theme','dark');}
+  _updateDarkBtn(!isDark);
+}
+function _updateDarkBtn(isDark){
+  const btn=document.getElementById('darkModeBtn');
+  if(!btn)return;
+  btn.innerHTML=isDark
+    ?'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-15v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M2 12h2m16 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+    :'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>';
+  btn.title=isDark?'Switch to light mode':'Switch to dark mode';
+}
+(function initDarkMode(){
+  const saved=localStorage.getItem('mq_theme');
+  const prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if(saved==='dark'||(saved===null&&prefersDark)){
+    document.documentElement.setAttribute('data-theme','dark');
+    _updateDarkBtn(true);
+  }
+})();
+function _wmToggle(id){
+var el=document.getElementById(id);
+if(!el)return;
+var c=el.classList.toggle('wm-collapsed');
+try{localStorage.setItem('wm_collapsed_'+id,c?'1':'0');}catch(e){}
+}
+(function(){
+var el=document.getElementById('mqWatermark');
+if(!el)return;
+try{if(localStorage.getItem('wm_collapsed_mqWatermark')==='1')el.classList.add('wm-collapsed');}catch(e){}
+})();
+</script>
+</body>
+</html>
